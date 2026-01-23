@@ -15,10 +15,15 @@ app.use(errorHandler);
 
 // CORS 跨域
 app.use(cors({
-  origin: '*',
+  origin: (ctx) => {
+    // 允许所有来源，或者指定具体域名
+    const allowedOrigins = ctx.get('Origin');
+    return allowedOrigins || '*';
+  },
   credentials: true,
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization']
+  allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  maxAge: 86400 // 预检请求缓存 24 小时
 }));
 
 // 请求体解析
