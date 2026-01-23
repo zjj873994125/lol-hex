@@ -1,0 +1,24 @@
+.hero-list-page {
+  padding-bottom: 40px;
+}
+
+.hero-list-search {
+  margin-bottom: 24px;
+}
+
+.hero-list-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 0;
+}
+
+.hero-list-pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.hero-list-empty {
+  margin-top: 80px;
+}

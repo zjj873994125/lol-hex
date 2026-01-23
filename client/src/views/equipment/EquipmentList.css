@@ -1,0 +1,24 @@
+.equipment-list-page {
+  padding-bottom: 40px;
+}
+
+.equipment-list-search {
+  margin-bottom: 24px;
+}
+
+.equipment-list-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 0;
+}
+
+.equipment-list-pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.equipment-list-empty {
+  margin-top: 80px;
+}

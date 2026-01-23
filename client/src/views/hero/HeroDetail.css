@@ -1,0 +1,45 @@
+.hero-detail-avatar {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.hero-description-card {
+  border-left: 4px solid #667eea;
+}
+
+.recommendation-card {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.recommendation-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.priority-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+}
+
+.hex-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  border: 2px solid;
+}
+
+.hex-icon-wrapper .ant-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

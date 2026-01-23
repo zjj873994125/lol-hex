@@ -1,0 +1,19 @@
+# 通用
+.DS_Store
+node_modules/
+dist/
+build/
+logs/
+
+# 前端
+client/node_modules/
+client/dist/
+client/.DS_Store
+
+# 后端（按你的技术栈选）
+server/node_modules/
+server/.DS_Store
+
+.env
+.env.local
+.env.*.local
