@@ -14,31 +14,18 @@ COPY client .
 RUN pnpm run build
 
 # ──────────────────────────────────────────────
-# ② 后端构建阶段
-# ──────────────────────────────────────────────
-FROM node:18-alpine AS server-build
-WORKDIR /app/server
-
-COPY server/package.json server/pnpm-lock.yaml ./
-RUN corepack enable && corepack prepare pnpm@8 --activate \
-    && pnpm install --frozen-lockfile          # 保留 devDeps 以运行 tsc
-
-COPY server .
-RUN pnpm run build                             # → dist/
-
-# ──────────────────────────────────────────────
-# ③ 运行阶段（最终镜像）
+# ② 运行阶段（最终镜像）
 # ──────────────────────────────────────────────
 FROM node:18-alpine
 WORKDIR /app
 
-# ── 后端运行文件 ──────────────────────────────
-COPY --from=server-build /app/server/dist ./server
-COPY --from=server-build /app/server/package.json /app/server/pnpm-lock.yaml ./server/
-
+# ── 后端文件（纯 JS，无需编译）──────────────────
+COPY server/package.json /app/server/
 WORKDIR /app/server
 RUN corepack enable && corepack prepare pnpm@8 --activate \
-    && pnpm install --prod --frozen-lockfile   # 仅装生产依赖
+    && pnpm install --prod
+
+COPY server/src /app/server/src
 
 # ── 前端静态文件 ──────────────────────────────
 COPY --from=client-build /app/client/dist /usr/share/nginx/html
@@ -49,4 +36,4 @@ COPY docker/nginx.conf /etc/nginx/nginx.conf
 
 # ── 暴露端口&启动 ─────────────────────────────
 EXPOSE 80 8899
-CMD sh -c "node app.js & nginx -g 'daemon off;'"
+CMD sh -c "node src/app.js & nginx -g 'daemon off;'"
