@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
-# 固定项目根目录（服务器 clone 路径，根据实际情况修改）
-PROJECT_DIR=/root/docker/hex-aram
+# 固定项目根目录（服务器 clone 路径）
+PROJECT_DIR=/root/docker/lol-hex-lite/lol-hex
 # 后端运行时 env 文件，已在服务器准备好
 ENV_FILE=$PROJECT_DIR/server/.env
 
-IMAGE_NAME=hex-aram
+IMAGE_NAME=lol-hex
 PORT_WEB=28080
 PORT_API=28899
 
