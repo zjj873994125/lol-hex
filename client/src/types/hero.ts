@@ -1,3 +1,5 @@
+export type { PageResult } from './common'
+
 export interface Hero {
   id: number
   name: string

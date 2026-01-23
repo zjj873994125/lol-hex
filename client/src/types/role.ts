@@ -1,5 +1,7 @@
 import { Menu } from './menu'
 
+export type { PageResult } from './common'
+
 export interface Role {
   id: number
   name: string

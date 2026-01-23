@@ -37,7 +37,8 @@ const MenuManage = () => {
       const res = await menuApi.getList()
       if (res.code === 200 || res.code === 0) {
         // 后端返回 { total, page, pageSize, list }
-        const menuList = res.data?.list || res.data || []
+        const data = res.data as any
+        const menuList = data?.list || res.data || []
         setMenus(Array.isArray(menuList) ? menuList : [])
       }
     } catch (error) {
@@ -101,8 +102,8 @@ const MenuManage = () => {
   }
 
   // 将菜单转换为扁平列表，用于表格展示
-  const flattenMenus = (menuList: Menu[], level = 0): Menu[] => {
-    const result: Menu[] = []
+  const flattenMenus = (menuList: Menu[], level = 0): Array<Menu & { level: number }> => {
+    const result: Array<Menu & { level: number }> = []
     menuList.forEach((menu) => {
       result.push({ ...menu, level })
       if (menu.children && menu.children.length > 0) {

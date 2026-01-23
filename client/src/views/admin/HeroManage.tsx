@@ -20,7 +20,6 @@ import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
-  ShieldOutlined,
   ThunderboltOutlined,
   IeOutlined,
   MinusCircleOutlined,

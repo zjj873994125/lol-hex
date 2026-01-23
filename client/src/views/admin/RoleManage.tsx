@@ -37,7 +37,7 @@ const RoleManage = () => {
   const fetchRoles = async () => {
     try {
       setLoading(true)
-      const res = await roleApi.getList()
+      const res = await roleApi.getList({})
       if (res.code === 200 || res.code === 0) {
         setRoles(res.data?.list || [])
       }

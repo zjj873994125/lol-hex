@@ -1,3 +1,5 @@
+export type { PageResult } from './common'
+
 export interface Equipment {
   id: number
   name: string
