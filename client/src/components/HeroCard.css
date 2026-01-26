@@ -1,34 +1,62 @@
+/* ==================== 英雄卡片 ==================== */
 .hero-card {
   position: relative;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  background: rgba(26, 26, 46, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
-  min-height: 200px;
+  min-height: 240px;
 }
 
+/* 悬停效果 */
 .hero-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
-  border-color: rgba(102, 126, 234, 0.4);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(102, 126, 234, 0.3) inset;
+  border-color: rgba(102, 126, 234, 0.5);
 }
 
+/* 光晕装饰 */
+.hero-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(
+    180deg,
+    rgba(102, 126, 234, 0.15) 0%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.hero-card:hover::before {
+  opacity: 1;
+}
+
+/* ==================== 头像区域 ==================== */
 .hero-avatar-section {
+  position: relative;
   width: 100%;
-  height: 217px;
+  height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
   overflow: hidden;
-  position: relative;
 }
 
+/* 背景光效 */
 .hero-avatar-section::before {
   content: '';
   position: absolute;
@@ -36,61 +64,144 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 50% 30%, rgba(102, 126, 234, 0.25) 0%, transparent 70%);
+  background: radial-gradient(circle at 50% 30%, rgba(102, 126, 234, 0.2) 0%, transparent 70%);
+}
+
+/* 装饰线 */
+.hero-avatar-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(102, 126, 234, 0.3) 50%, transparent 100%);
 }
 
 .hero-avatar {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: top center;
-  transition: transform 0.4s ease;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
 }
 
 .hero-card:hover .hero-avatar {
-  transform: scale(1.08);
+  transform: scale(1.1);
+  filter: drop-shadow(0 12px 24px rgba(102, 126, 234, 0.3));
 }
 
+/* ==================== 信息区域 ==================== */
 .hero-info-section {
-  padding: 10px 12px;
+  position: relative;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   flex: 1;
+  background: linear-gradient(180deg, rgba(15, 15, 26, 0) 0%, rgba(102, 126, 234, 0.05) 100%);
 }
 
 .hero-title-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   white-space: nowrap;
   overflow: hidden;
 }
 
 .hero-title {
   font-size: 12px;
-  color: #8b95a5;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
   flex-shrink: 0;
 }
 
 .hero-name {
-  font-size: 15px;
-  font-weight: 600;
-  color: #1a1a2e;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: 0.3px;
 }
 
+/* ==================== 职业标签 ==================== */
 .hero-roles {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
 }
 
 .hero-role-tag {
-  padding: 2px 8px;
-  border-radius: 8px;
-  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
   font-weight: 600;
   flex-shrink: 0;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.hero-card:hover .hero-role-tag {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* 各职业标签颜色微调 */
+.hero-role-tag[style*="#ef4444"] {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.8), rgba(185, 28, 28, 0.8));
+}
+
+.hero-role-tag[style*="#3b82f6"] {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(30, 64, 175, 0.8));
+}
+
+.hero-role-tag[style*="#8b5cf6"] {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(109, 40, 217, 0.8));
+}
+
+.hero-role-tag[style*="#f97316"] {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.8), rgba(221, 107, 32, 0.8));
+}
+
+.hero-role-tag[style*="#10b981"] {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(5, 150, 105, 0.8));
+}
+
+.hero-role-tag[style*="#06b6d4"] {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.8), rgba(8, 145, 178, 0.8));
+}
+
+/* ==================== 响应式 ==================== */
+@media (max-width: 768px) {
+  .hero-card {
+    min-height: 220px;
+  }
+
+  .hero-avatar-section {
+    height: 180px;
+  }
+
+  .hero-name {
+    font-size: 14px;
+  }
+
+  .hero-title {
+    font-size: 11px;
+  }
+
+  .hero-role-tag {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
 }

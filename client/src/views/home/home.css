@@ -1,23 +1,60 @@
+/* ==================== 首页容器 ==================== */
 .home-page {
-  padding-bottom: 40px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0a0e27 0%, #1a1a2e 100%);
+  position: relative;
+  overflow: hidden;
 }
 
+/* 背景装饰 */
+.home-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 85% 80%, rgba(118, 75, 162, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ==================== 快捷菜单卡片 ==================== */
 .quick-menus-card {
-  margin-bottom: 24px;
-  border-radius: 16px !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 32px;
+  background: rgba(26, 26, 46, 0.6) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset !important;
 }
 
+.quick-menus-card .ant-card-body {
+  padding: 24px;
+}
+
+.quick-menus-card .ant-row {
+  margin: -8px;
+}
+
+/* ==================== 快捷菜单项 ==================== */
 .quick-menu-item {
   position: relative;
-  padding: 24px 16px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 24px 20px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   text-align: center;
+  margin: 8px;
 }
 
 .quick-menu-item::before {
@@ -25,58 +62,173 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 4px;
-  height: 100%;
+  width: 100%;
+  height: 3px;
   background: var(--menu-color, #667eea);
-  transition: width 0.3s ease;
+  transform: scaleX(0);
+  transition: transform 0.4s ease;
+}
+
+.quick-menu-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, var(--menu-color, #667eea) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  border-radius: 16px;
 }
 
 .quick-menu-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  transform: translateY(-8px) scale(1.02);
+  background: rgba(255, 255, 255, 0.06);
   border-color: var(--menu-color, #667eea);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
 }
 
 .quick-menu-item:hover::before {
-  width: 100%;
-  opacity: 0.05;
+  transform: scaleX(1);
+}
+
+.quick-menu-item:hover::after {
+  opacity: 0.15;
 }
 
 .menu-icon {
-  font-size: 36px;
+  position: relative;
+  z-index: 1;
+  font-size: 42px;
   margin-bottom: 12px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-  transition: transform 0.3s ease;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  transition: transform 0.4s ease;
 }
 
 .quick-menu-item:hover .menu-icon {
-  transform: scale(1.1);
+  transform: scale(1.15) rotate(5deg);
 }
 
 .menu-title {
+  position: relative;
+  z-index: 1;
   font-size: 16px;
-  font-weight: 600;
-  color: #1a1a2e;
-  margin-bottom: 4px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
 }
 
 .menu-description {
+  position: relative;
+  z-index: 1;
   font-size: 12px;
-  color: #8b95a5;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.3px;
 }
 
+/* ==================== 英雄卡片容器 ==================== */
 .hot-heroes-card {
-  border-radius: 16px !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+  position: relative;
+  z-index: 1;
+  background: rgba(26, 26, 46, 0.6) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset !important;
 }
 
 .hot-heroes-card .ant-card-head {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 20px 24px;
 }
 
+.hot-heroes-card .ant-card-head-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.hot-heroes-card .ant-card-body {
+  padding: 20px;
+}
+
+/* ==================== 加载状态 ==================== */
 .loading-container {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 60px 0;
+}
+
+.loading-container .ant-spin {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.loading-container .ant-spin-dot-item {
+  background-color: rgba(102, 126, 234, 0.8);
+}
+
+/* ==================== 空状态 ==================== */
+.hot-heroes-card .ant-empty {
+  padding: 40px 0;
+}
+
+.hot-heroes-card .ant-empty-description {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.hot-heroes-card .ant-empty-simple {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ==================== 响应式 ==================== */
+@media (max-width: 768px) {
+  .quick-menus-card .ant-card-body {
+    padding: 16px;
+  }
+
+  .quick-menu-item {
+    padding: 20px 12px;
+  }
+
+  .menu-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+
+  .menu-title {
+    font-size: 14px;
+  }
+
+  .menu-description {
+    font-size: 11px;
+  }
+
+  .hot-heroes-card .ant-card-body {
+    padding: 16px;
+  }
+}
+
+/* ==================== 装饰粒子效果 ==================== */
+.home-page::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.03) 0%, transparent 100%),
+    radial-gradient(2px 2px at 60% 70%, rgba(255, 255, 255, 0.03) 0%, transparent 100%),
+    radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.03) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 10%, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
+  background-size: 200% 200%;
+  animation: twinkle 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
 }
