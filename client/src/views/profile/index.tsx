@@ -124,6 +124,7 @@ const Profile = () => {
                 </span>
               }
               className="profile-form-card"
+              style={{ marginBottom: '20px' }}
               bordered={false}
             >
               <Form

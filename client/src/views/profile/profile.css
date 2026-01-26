@@ -1,92 +1,74 @@
+/* ==================== 个人主页 ==================== */
 .profile-page {
+  min-height: 100vh;
+  position: relative;
   padding-bottom: 40px;
 }
 
+/* 背景装饰 */
+.profile-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 90% 80%, rgba(118, 75, 162, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
 .profile-container {
+  position: relative;
+  z-index: 1;
   max-width: 1000px;
 }
 
-/* 左侧信息卡片 */
+/* ==================== 通用卡片样式 ==================== */
+.profile-info-card,
+.profile-form-card,
+.profile-security-card {
+  background: rgba(26, 26, 46, 0.6) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset !important;
+  transition: all 0.3s ease;
+}
+
+.profile-info-card:hover,
+.profile-form-card:hover,
+.profile-security-card:hover {
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(102, 126, 234, 0.1) inset !important;
+}
+
 .profile-info-card {
-  border-radius: 16px !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
   height: 100%;
 }
 
-.profile-avatar-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px 0;
-  border-bottom: 1px solid #f0f0f0;
-  margin-bottom: 20px;
+.profile-info-card .ant-card-body,
+.profile-form-card .ant-card-body,
+.profile-security-card .ant-card-body {
+  padding: 24px;
 }
 
-.profile-avatar-large {
-  border: 4px solid #fff;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  margin-bottom: 16px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+/* 卡片标题 */
+.profile-form-card .ant-card-head,
+.profile-security-card .ant-card-head {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.profile-username {
-  margin: 0;
-  font-size: 20px;
+.profile-form-card .ant-card-head-title,
+.profile-security-card .ant-card-head-title {
+  color: #ffffff;
+  font-size: 16px;
   font-weight: 600;
-  color: #1a1a2e;
-}
-
-.profile-phone {
-  margin: 8px 0 0;
-  font-size: 14px;
-  color: #8b95a5;
-}
-
-.profile-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.stat-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background: #f8f9fa;
-  border-radius: 10px;
-}
-
-.stat-label {
-  font-size: 13px;
-  color: #8b95a5;
-}
-
-.stat-value {
-  font-size: 14px;
-  font-weight: 500;
-  color: #1a1a2e;
-}
-
-.status-active {
-  color: #52c41a;
-}
-
-.status-inactive {
-  color: #ff4d4f;
-}
-
-/* 右侧表单卡片 */
-.profile-form-card,
-.profile-security-card {
-  border-radius: 16px !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
-  margin-bottom: 24px;
-}
-
-.profile-form-card:last-child,
-.profile-security-card:last-child {
-  margin-bottom: 0;
 }
 
 .card-title {
@@ -95,21 +77,221 @@
   gap: 8px;
   font-size: 16px;
   font-weight: 600;
+  color: #ffffff;
 }
 
+.card-title .anticon {
+  color: #667eea;
+}
+
+/* ==================== 左侧信息卡片 ==================== */
+.profile-avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 头像背景光效 */
+.profile-avatar-section::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.2) 0%, transparent 70%);
+  z-index: 0;
+}
+
+.profile-avatar-large {
+  position: relative;
+  z-index: 1;
+  width: 100px;
+  height: 100px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(102, 126, 234, 0.3) inset;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  transition: all 0.3s ease;
+}
+
+.profile-avatar-large:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 12px 32px rgba(102, 126, 234, 0.4),
+    0 0 0 2px rgba(102, 126, 234, 0.5) inset;
+}
+
+.profile-username {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+.profile-phone {
+  position: relative;
+  z-index: 1;
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.profile-phone .anticon {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ==================== 统计信息 ==================== */
+.profile-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(102, 126, 234, 0.2);
+}
+
+.stat-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.status-active {
+  color: #52c41a;
+  text-shadow: 0 0 10px rgba(82, 196, 26, 0.3);
+}
+
+.status-inactive {
+  color: #ff4d4f;
+  text-shadow: 0 0 10px rgba(255, 77, 79, 0.3);
+}
+
+/* ==================== 表单样式 ==================== */
+.profile-form-card .ant-form-item-label > label {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.profile-form-card .ant-input,
+.profile-form-card .ant-input-affix-wrapper {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.profile-form-card .ant-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.profile-form-card .ant-input:hover,
+.profile-form-card .ant-input-affix-wrapper:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.profile-form-card .ant-input:focus,
+.profile-form-card .ant-input-affix-wrapper-focused {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(102, 126, 234, 0.5);
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+.profile-form-card .ant-input-affix-wrapper .ant-input {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.profile-form-card .ant-input-prefix {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.profile-form-card .ant-input-disabled {
+  background: rgba(255, 255, 255, 0.02) !important;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.profile-form-card .ant-form-item-explain-error {
+  color: #ff6b6b;
+}
+
+/* 按钮样式 */
+.profile-form-card .ant-btn-primary {
+  height: 44px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.profile-form-card .ant-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5568d3 0%, #653a8f 100%);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
+}
+
+.profile-form-card .ant-btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* 头像预览 */
 .avatar-preview {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px;
-  background: #f8f9fa;
-  border-radius: 8px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
   margin-top: 8px;
   font-size: 14px;
-  color: #8b95a5;
+  color: rgba(255, 255, 255, 0.5);
 }
 
-/* 安全设置 */
+.avatar-preview .ant-avatar {
+  border: 2px solid rgba(102, 126, 234, 0.3);
+}
+
+/* ==================== 安全设置 ==================== */
 .security-list {
   display: flex;
   flex-direction: column;
@@ -120,14 +302,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  background: #f8f9fa;
-  border-radius: 12px;
+  padding: 18px 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
   transition: all 0.3s ease;
 }
 
 .security-item:hover {
-  background: #f0f2f5;
+  background: rgba(102, 126, 234, 0.08);
+  border-color: rgba(102, 126, 234, 0.2);
+  transform: translateX(4px);
 }
 
 .security-item-left {
@@ -137,29 +322,188 @@
 }
 
 .security-icon {
-  font-size: 20px;
+  font-size: 24px;
   color: #667eea;
+  filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.4));
 }
 
 .security-item h4 {
   margin: 0;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
+  color: #ffffff;
 }
 
 .security-item p {
   margin: 4px 0 0;
+  font-size: 13px;
 }
 
-/* 响应式 */
+.security-item .text-gray-500 {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.security-item .text-sm {
+  font-size: 13px;
+}
+
+.security-item .ant-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  padding: 0 20px;
+  height: 36px;
+  transition: all 0.3s ease;
+}
+
+.security-item .ant-btn:hover {
+  background: rgba(102, 126, 234, 0.2);
+  border-color: rgba(102, 126, 234, 0.4);
+  color: #fff;
+}
+
+/* ==================== 弹窗样式 ==================== */
+.profile-page .ant-modal-content {
+  background: rgba(26, 26, 46, 0.95) !important;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+.profile-page .ant-modal-header {
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 20px 24px;
+}
+
+.profile-page .ant-modal-title {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.profile-page .ant-modal-close-x {
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.3s ease;
+}
+
+.profile-page .ant-modal-close-x:hover {
+  color: #ffffff;
+}
+
+.profile-page .ant-modal-body {
+  padding: 24px;
+}
+
+.profile-page .ant-modal-confirm-body .ant-modal-content {
+  background: rgba(26, 26, 46, 0.95);
+}
+
+/* 弹窗内的表单 */
+.profile-page .ant-modal .ant-form-item-label > label {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.profile-page .ant-modal .ant-input,
+.profile-page .ant-modal .ant-input-affix-wrapper,
+.profile-page .ant-modal .ant-input-password {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff;
+  border-radius: 10px;
+}
+
+.profile-page .ant-modal .ant-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.profile-page .ant-modal .ant-input:hover,
+.profile-page .ant-modal .ant-input-affix-wrapper:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.profile-page .ant-modal .ant-input-affix-wrapper-focused {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(102, 126, 234, 0.5) !important;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2) !important;
+}
+
+.profile-page .ant-modal .ant-input-affix-wrapper .ant-input {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.profile-page .ant-modal .ant-input-prefix {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.profile-page .ant-modal .ant-input-password-icon {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.profile-page .ant-modal .ant-input-password-icon:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.profile-page .ant-modal .ant-btn-primary {
+  height: 42px;
+  border-radius: 10px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.profile-page .ant-modal .ant-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5568d3 0%, #653a8f 100%);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+  transform: translateY(-1px);
+}
+
+/* ==================== 响应式 ==================== */
 @media (max-width: 768px) {
   .profile-avatar-section {
-    padding: 16px 0;
+    padding: 24px 16px;
   }
 
   .profile-avatar-large {
     width: 80px;
     height: 80px;
+    font-size: 32px;
+  }
+
+  .profile-username {
+    font-size: 18px;
+  }
+
+  .profile-info-card .ant-card-body,
+  .profile-form-card .ant-card-body,
+  .profile-security-card .ant-card-body {
+    padding: 20px 16px;
+  }
+
+  .security-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .security-item .ant-btn {
+    width: 100%;
+  }
+
+  .profile-page .ant-modal {
+    max-width: calc(100vw - 32px);
+  }
+
+  .profile-page .ant-modal-content {
+    border-radius: 16px;
   }
 }
-
