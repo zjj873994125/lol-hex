@@ -11,6 +11,7 @@ export interface Hero {
   status: number
   equipments?: HeroEquipment[]
   hexes?: HeroHex[]
+  recommendedHexes?: HeroHex[]  // 推荐海克斯（与hexes相同，用于兼容）
   equipmentBuilds?: EquipmentBuild[]
   createdAt: string
   updatedAt: string

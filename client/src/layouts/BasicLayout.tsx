@@ -27,7 +27,7 @@ const BasicLayout = () => {
   }
 
   // 检查是否是管理员
-  const isAdmin = user?.roles?.some((r: any) => r.code === 'admin')
+  const isAdmin = user?.role?.code === 'admin'
 
   const userMenuItems = [
     {

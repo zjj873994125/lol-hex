@@ -139,7 +139,7 @@ const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({
           placeholder={searchPlaceholder}
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
-          onPressEnter={handleSearch}
+          onPressEnter={() => handleSearch()}
           allowClear
           style={{ width: 200 }}
         />
@@ -149,7 +149,7 @@ const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({
         <Button
           type="primary"
           icon={<SearchOutlined />}
-          onClick={handleSearch}
+          onClick={() => handleSearch()}
         >
           搜索
         </Button>

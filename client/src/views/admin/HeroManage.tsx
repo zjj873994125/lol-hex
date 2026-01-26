@@ -32,7 +32,7 @@ import PageHeader from '@/components/PageHeader'
 import { heroApi } from '@/api/hero'
 import { equipmentApi } from '@/api/equipment'
 import { hexApi } from '@/api/hex'
-import type { Hero, HeroFormData, EquipmentBuild, BuildEquipment } from '@/types/hero'
+import type { Hero, HeroFormData, EquipmentBuild, BuildEquipment, HeroHex } from '@/types/hero'
 import type { Equipment } from '@/types/equipment'
 import type { Hex } from '@/types/hex'
 import { getRoleLabel, getRoleColor } from '@/utils/heroMapping'
@@ -302,7 +302,7 @@ const HeroManage = () => {
       const res = await heroApi.getDetail(hero.id)
       if (res.code === 200 || res.code === 0 && res.data) {
         const recommendedHexes = res.data.recommendedHexes || []
-        setSelectedHexes(recommendedHexes.map((h: any) => ({
+        setSelectedHexes(recommendedHexes.map((h: HeroHex) => ({
           hexId: h.hex?.id,
           priority: h.priority || 1,
           description: h.description || '',

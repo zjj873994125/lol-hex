@@ -4,7 +4,7 @@ import { Card, Row, Col, Tag, Spin, Empty, Badge, Popover, Divider, Collapse } f
 import { IeOutlined, ThunderboltOutlined, StarFilled, TrophyOutlined, RocketOutlined } from '@ant-design/icons'
 import PageHeader from '@/components/PageHeader'
 import { heroApi } from '@/api/hero'
-import type { Hero, EquipmentBuild, BuildEquipment } from '@/types/hero'
+import type { Hero, EquipmentBuild, BuildEquipment, HeroHex } from '@/types/hero'
 import { HexTierColorMap } from '@/types/hex'
 import { getRoleLabel, getRoleColor } from '@/utils/heroMapping'
 import './HeroDetail.css'
@@ -66,7 +66,7 @@ const HeroDetail = () => {
   }
 
   if (hero.recommendedHexes) {
-    hero.recommendedHexes.forEach((heroHex) => {
+    hero.recommendedHexes.forEach((heroHex: HeroHex) => {
       const tier = heroHex.hex?.tier || 1
       if (!hexesByTier[tier]) {
         hexesByTier[tier] = []
@@ -75,7 +75,7 @@ const HeroDetail = () => {
     })
     // 每个等级内按优先级排序
     Object.keys(hexesByTier).forEach((key) => {
-      hexesByTier[Number(key)]?.sort((a, b) => a.priority - b.priority)
+      hexesByTier[Number(key)]?.sort((a: HeroHex, b: HeroHex) => a.priority - b.priority)
     })
   }
 
@@ -283,7 +283,7 @@ const HeroDetail = () => {
                   return (
                     <div key={tier} className="hex-tier-section">
                       <div className="hex-tier-items">
-                        {tierHexes.map((heroHex) => {
+                        {tierHexes.map((heroHex: HeroHex) => {
                           const content = (
                             <div className="popover-content">
                               <div className="popover-name">{heroHex.hex?.name}</div>
