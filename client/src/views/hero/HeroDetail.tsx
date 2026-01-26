@@ -59,7 +59,7 @@ const HeroDetail = () => {
 
   // 按等级分组海克斯，并在组内按优先级排序 (棱彩1 > 黄金3 > 白银2)
   const tierOrder = [1, 3, 2] // 棱彩 > 黄金 > 白银
-  const hexesByTier: Record<number, typeof hero.recommendedHexes> = {
+  const hexesByTier: Record<number, HeroHex[]> = {
     1: [],
     2: [],
     3: [],
@@ -274,7 +274,7 @@ const HeroDetail = () => {
               </div>
             </div>
 
-            {tierOrder.some((tier) => hexesByTier[tier]?.length > 0) ? (
+            {tierOrder.some((tier) => (hexesByTier[tier]?.length || 0) > 0) ? (
               <div className="hex-tier-sections">
                 {tierOrder.map((tier) => {
                   const tierHexes = hexesByTier[tier] || []
