@@ -1,10 +1,77 @@
+/* ==================== 搜索栏容器 ==================== */
 .search-bar {
+  display: flex;
+  align-items: center;
+  padding: 20px 24px;
+  background: rgba(26, 26, 46, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+.search-bar .ant-space {
+  width: 100%;
+}
+
+.search-bar .ant-space-item {
   display: flex;
   align-items: center;
 }
 
-.filter-radio-group,
-.filter-checkbox-group {
+/* ==================== 输入框样式 ==================== */
+.search-bar .ant-input,
+.search-bar .ant-input-affix-wrapper {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.search-bar .ant-input-affix-wrapper-focused {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(102, 126, 234, 0.5) !important;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2) !important;
+}
+
+.search-bar .ant-input-affix-wrapper .ant-input {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.search-bar .ant-input:hover,
+.search-bar .ant-input-affix-wrapper:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.search-bar .ant-input:focus,
+.search-bar .ant-input-focused {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(102, 126, 234, 0.5);
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+/* Placeholder 样式 - 需要考虑 affix wrapper 的情况 */
+.search-bar .ant-input::placeholder,
+.search-bar .ant-input-input::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.search-bar .ant-input-clear-icon {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.search-bar .ant-input-clear-icon:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ==================== 单选按钮组 ==================== */
+.filter-radio-group {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -12,35 +79,207 @@
 
 .filter-label {
   font-size: 14px;
-  color: #fff;
+  color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
+  margin-right: 8px;
 }
 
 .filter-radio-group .ant-radio-button-wrapper {
-  /* border-radius: 6px; */
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  padding: 4px 16px;
   transition: all 0.3s ease;
+  height: auto;
+  line-height: 1.5;
+}
+
+.filter-radio-group .ant-radio-button-wrapper::before {
+  display: none;
+}
+
+.filter-radio-group .ant-radio-button-wrapper:hover {
+  border-color: rgba(102, 126, 234, 0.5);
+  background: rgba(102, 126, 234, 0.1);
   color: #fff;
+}
+
+.filter-radio-group .ant-radio-button-wrapper-checked {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* ==================== 复选框组 ==================== */
+.filter-checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .filter-checkbox-group .ant-checkbox-group {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .filter-checkbox-group .ant-checkbox-wrapper {
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 4px 12px;
-  border: 1px solid #d9d9d9;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
   transition: all 0.3s ease;
-  background-color: rgba(255, 255, 255);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .filter-checkbox-group .ant-checkbox-wrapper:hover {
-  border-color: #1890ff;
-  background-color: #e6f7ff;
+  border-color: rgba(102, 126, 234, 0.5);
+  background: rgba(102, 126, 234, 0.1);
+  color: #fff;
 }
 
 .filter-checkbox-group .ant-checkbox-wrapper-checked {
-  border-color: #1890ff;
-  background-color: #e6f7ff;
+  border-color: transparent;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.filter-checkbox-group .ant-checkbox-inner {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.filter-checkbox-group .ant-checkbox-wrapper-checked .ant-checkbox-inner {
+  background: #fff;
+  border-color: #fff;
+}
+
+.filter-checkbox-group .ant-checkbox-wrapper-checked .ant-checkbox-inner::after {
+  border-color: #667eea;
+}
+
+/* ==================== 选择器样式 ==================== */
+.search-bar .ant-select-selector {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  border-radius: 10px !important;
+  transition: all 0.3s ease;
+}
+
+.search-bar .ant-select:hover .ant-select-selector {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.search-bar .ant-select-focused .ant-select-selector {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(102, 126, 234, 0.5) !important;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2) !important;
+}
+
+.search-bar .ant-select-selection-placeholder {
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.search-bar .ant-select-selection-item {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.search-bar .ant-select-arrow {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.search-bar .ant-select-clear {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.search-bar .ant-select-clear:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* 下拉菜单样式 */
+.search-bar .ant-select-dropdown {
+  background: rgba(26, 26, 46, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.search-bar .ant-select-item {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.search-bar .ant-select-item-option-selected {
+  background: rgba(102, 126, 234, 0.2) !important;
+  color: #fff !important;
+}
+
+.search-bar .ant-select-item-option-active {
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.search-bar .ant-select-item-empty {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ==================== 按钮样式 ==================== */
+.search-bar .ant-btn {
+  border-radius: 10px;
+  height: 38px;
+  padding: 0 20px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.search-bar .ant-btn-default {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.search-bar .ant-btn-default:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.search-bar .ant-btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.search-bar .ant-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5568d3 0%, #653a8f 100%);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+  transform: translateY(-1px);
+}
+
+.search-bar .ant-btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* ==================== 响应式 ==================== */
+@media (max-width: 768px) {
+  .search-bar {
+    padding: 16px;
+    flex-wrap: wrap;
+  }
+
+  .search-bar .ant-space {
+    flex-wrap: wrap;
+  }
+
+  .search-bar .ant-input {
+    width: 100% !important;
+  }
+
+  .filter-checkbox-group .ant-checkbox-group {
+    justify-content: center;
+  }
 }

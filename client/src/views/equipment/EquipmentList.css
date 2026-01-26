@@ -1,25 +1,214 @@
+/* ==================== 装备列表页面 ==================== */
 .equipment-list-page {
+  min-height: 100vh;
+  position: relative;
   padding-bottom: 40px;
 }
 
+/* 背景装饰 */
+.equipment-list-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 15% 30%, rgba(249, 115, 22, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 85% 70%, rgba(139, 92, 246, 0.06) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ==================== 搜索栏区域 ==================== */
 .equipment-list-search {
+  position: relative;
+  z-index: 1;
   margin-bottom: 24px;
 }
 
+/* ==================== 内容卡片 ==================== */
+.equipment-list-content {
+  position: relative;
+  z-index: 1;
+  background: rgba(26, 26, 46, 0.6) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset !important;
+  transition: all 0.3s ease;
+}
+
+.equipment-list-content:hover {
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(249, 115, 22, 0.1) inset !important;
+}
+
+.equipment-list-content .ant-card-body {
+  padding: 24px;
+}
+
+/* ==================== 加载状态 ==================== */
 .equipment-list-loading {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 80px 0;
+  padding: 100px 0;
+  position: relative;
+  z-index: 1;
+  background: rgba(26, 26, 46, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.equipment-list-content {
-  border-radius: 16px !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+.equipment-list-loading .ant-spin {
+  color: rgba(255, 255, 255, 0.5);
 }
 
+.equipment-list-loading .ant-spin-dot-item {
+  background-color: rgba(249, 115, 22, 0.8);
+}
+
+/* ==================== 空状态 ==================== */
+.equipment-list-content .ant-empty {
+  padding: 60px 0;
+}
+
+.equipment-list-content .ant-empty-description {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.equipment-list-content .ant-empty-simple {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ==================== 分页器 ==================== */
 .equipment-list-pagination {
   display: flex;
   justify-content: center;
-  margin-top: 20px; 
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.equipment-list-pagination .ant-pagination {
+  display: flex;
+  align-items: center;
+}
+
+.equipment-list-pagination .ant-pagination-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.equipment-list-pagination .ant-pagination-item a {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.equipment-list-pagination .ant-pagination-item:hover {
+  border-color: rgba(249, 115, 22, 0.5);
+  background: rgba(249, 115, 22, 0.1);
+}
+
+.equipment-list-pagination .ant-pagination-item:hover a {
+  color: #fff;
+}
+
+.equipment-list-pagination .ant-pagination-item-active {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
+  border-color: transparent !important;
+}
+
+.equipment-list-pagination .ant-pagination-item-active a {
+  color: #fff !important;
+}
+
+.equipment-list-pagination .ant-pagination-prev,
+.equipment-list-pagination .ant-pagination-next,
+.equipment-list-pagination .ant-pagination-jump-prev,
+.equipment-list-pagination .ant-pagination-jump-next {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.equipment-list-pagination .ant-pagination-prev:hover,
+.equipment-list-pagination .ant-pagination-next:hover {
+  border-color: rgba(249, 115, 22, 0.5);
+  background: rgba(249, 115, 22, 0.1);
+}
+
+.equipment-list-pagination .ant-pagination-prev .ant-pagination-item-link,
+.equipment-list-pagination .ant-pagination-next .ant-pagination-item-link {
+  color: rgba(255, 255, 255, 0.7);
+  background: transparent;
+  border: none;
+}
+
+.equipment-list-pagination .ant-pagination-prev:hover .ant-pagination-item-link,
+.equipment-list-pagination .ant-pagination-next:hover .ant-pagination-item-link {
+  color: #fff;
+}
+
+.equipment-list-pagination .ant-pagination-jump-prev button,
+.equipment-list-pagination .ant-pagination-jump-next button {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.equipment-list-pagination .ant-pagination-jump-prev:hover button,
+.equipment-list-pagination .ant-pagination-jump-next:hover button {
+  color: #f97316;
+}
+
+.equipment-list-pagination .ant-pagination-total-text {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* 分页大小选择器 */
+.equipment-list-pagination .ant-select-selector {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  border-radius: 8px !important;
+}
+
+.equipment-list-pagination .ant-select-arrow {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.equipment-list-pagination .ant-select-dropdown {
+  background: rgba(26, 26, 46, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.equipment-list-pagination .ant-select-item {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.equipment-list-pagination .ant-select-item-option-selected {
+  background: rgba(249, 115, 22, 0.2) !important;
+  color: #f97316 !important;
+}
+
+.equipment-list-pagination .ant-select-item-option-active {
+  background: rgba(249, 115, 22, 0.1);
+}
+
+/* ==================== 响应式 ==================== */
+@media (max-width: 768px) {
+  .equipment-list-content .ant-card-body {
+    padding: 16px;
+  }
+
+  .equipment-list-pagination {
+    margin-top: 24px;
+    padding-top: 16px;
+  }
 }

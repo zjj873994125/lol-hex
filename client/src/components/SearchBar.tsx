@@ -84,7 +84,7 @@ const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({
               // }}
             >
               {filter.options.map((option) => (
-                <Radio.Button style={{ color: '#000' }} key={option.value} value={option.value}>
+                <Radio.Button style={{ color: '#fff' }} key={option.value} value={option.value}>
                   {option.label}
                 </Radio.Button>
               ))}

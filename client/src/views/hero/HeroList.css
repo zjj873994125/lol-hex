@@ -1,25 +1,184 @@
+/* ==================== 英雄列表页面 ==================== */
 .hero-list-page {
+  min-height: 100vh;
+  position: relative;
   padding-bottom: 40px;
 }
 
+/* 背景装饰 */
+.hero-list-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 90% 80%, rgba(118, 75, 162, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ==================== 搜索栏区域 ==================== */
 .hero-list-search {
+  position: relative;
+  z-index: 1;
   margin-bottom: 24px;
 }
 
+/* ==================== 内容卡片 ==================== */
+.hero-list-content {
+  position: relative;
+  z-index: 1;
+  background: rgba(26, 26, 46, 0.6) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset !important;
+  transition: all 0.3s ease;
+}
+
+.hero-list-content:hover {
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(102, 126, 234, 0.1) inset !important;
+}
+
+.hero-list-content .ant-card-body {
+  padding: 24px;
+}
+
+/* ==================== 加载状态 ==================== */
 .hero-list-loading {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 80px 0;
+  padding: 100px 0;
+  position: relative;
+  z-index: 1;
+  background: rgba(26, 26, 46, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.hero-list-content {
-  border-radius: 16px !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+.hero-list-loading .ant-spin {
+  color: rgba(255, 255, 255, 0.5);
 }
 
+.hero-list-loading .ant-spin-dot-item {
+  background-color: rgba(102, 126, 234, 0.8);
+}
+
+/* ==================== 空状态 ==================== */
+.hero-list-content .ant-empty {
+  padding: 60px 0;
+}
+
+.hero-list-content .ant-empty-description {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.hero-list-content .ant-empty-simple {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ==================== 分页器 ==================== */
 .hero-list-pagination {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hero-list-pagination .ant-pagination {
+  display: flex;
+  align-items: center;
+}
+
+.hero-list-pagination .ant-pagination-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.hero-list-pagination .ant-pagination-item a {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.hero-list-pagination .ant-pagination-item:hover {
+  border-color: rgba(102, 126, 234, 0.5);
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.hero-list-pagination .ant-pagination-item:hover a {
+  color: #fff;
+}
+
+.hero-list-pagination .ant-pagination-item-active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border-color: transparent !important;
+}
+
+.hero-list-pagination .ant-pagination-item-active a {
+  color: #fff !important;
+}
+
+.hero-list-pagination .ant-pagination-prev,
+.hero-list-pagination .ant-pagination-next,
+.hero-list-pagination .ant-pagination-jump-prev,
+.hero-list-pagination .ant-pagination-jump-next {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.hero-list-pagination .ant-pagination-prev:hover,
+.hero-list-pagination .ant-pagination-next:hover {
+  border-color: rgba(102, 126, 234, 0.5);
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.hero-list-pagination .ant-pagination-prev .ant-pagination-item-link,
+.hero-list-pagination .ant-pagination-next .ant-pagination-item-link {
+  color: rgba(255, 255, 255, 0.7);
+  background: transparent;
+  border: none;
+}
+
+.hero-list-pagination .ant-pagination-prev:hover .ant-pagination-item-link,
+.hero-list-pagination .ant-pagination-next:hover .ant-pagination-item-link {
+  color: #fff;
+}
+
+.hero-list-pagination .ant-pagination-jump-prev button,
+.hero-list-pagination .ant-pagination-jump-next button {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.hero-list-pagination .ant-pagination-jump-prev:hover button,
+.hero-list-pagination .ant-pagination-jump-next:hover button {
+  color: #667eea;
+}
+
+.hero-list-pagination .ant-pagination-total-text {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ==================== 响应式 ==================== */
+@media (max-width: 768px) {
+  .hero-list-content .ant-card-body {
+    padding: 16px;
+  }
+
+  .hero-list-pagination {
+    margin-top: 24px;
+    padding-top: 16px;
+  }
 }
