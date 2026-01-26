@@ -21,6 +21,7 @@ async function migrate() {
     console.log('  - hexes');
     console.log('  - hero_equipment');
     console.log('  - hero_hex');
+    console.log('  - equipment_builds');
 
     await sequelize.close();
   } catch (error) {

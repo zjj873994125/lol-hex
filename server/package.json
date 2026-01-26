@@ -15,7 +15,13 @@
     "import:equipments": "node src/scripts/importEquipments.js",
     "import:hexes": "node src/scripts/importHexes.js"
   },
-  "keywords": ["koa", "sequelize", "mysql", "jwt", "rbac"],
+  "keywords": [
+    "koa",
+    "sequelize",
+    "mysql",
+    "jwt",
+    "rbac"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {

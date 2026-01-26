@@ -17,4 +17,10 @@ router.post('/register', AuthController.register);
 // 获取当前用户信息（需要认证）
 router.get('/userInfo', authMiddleware, loadUserPermissions(db.User), AuthController.getUserInfo);
 
+// 更新个人信息（需要认证）
+router.put('/profile', authMiddleware, AuthController.updateProfile);
+
+// 修改密码（需要认证）
+router.put('/changePassword', authMiddleware, AuthController.changePassword);
+
 module.exports = router;

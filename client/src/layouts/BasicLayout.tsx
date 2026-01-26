@@ -1,5 +1,5 @@
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
-import { Layout, Menu, Avatar, Dropdown, theme } from 'antd'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Layout, Avatar, Dropdown, theme } from 'antd'
 import {
   HomeOutlined,
   UserOutlined,
@@ -7,8 +7,12 @@ import {
   AppstoreOutlined,
   ThunderboltOutlined,
   LogoutOutlined,
+  CrownOutlined,
+  SettingOutlined,
 } from '@ant-design/icons'
 import { useUserStore } from '@/store/user'
+import backgroundImg from '@/assets/background.jpg'
+import './BasicLayout.css'
 
 const { Header, Content, Footer } = Layout
 
@@ -16,9 +20,6 @@ const BasicLayout = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const { user, logout } = useUserStore()
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken()
 
   const handleLogout = () => {
     logout()
@@ -29,6 +30,12 @@ const BasicLayout = () => {
   const isAdmin = user?.roles?.some((r: any) => r.code === 'admin')
 
   const userMenuItems = [
+    {
+      key: 'profile',
+      icon: <SettingOutlined />,
+      label: '个人中心',
+      onClick: () => navigate('/profile'),
+    },
     ...(isAdmin ? [{
       key: 'admin',
       icon: <AppstoreOutlined />,
@@ -43,77 +50,66 @@ const BasicLayout = () => {
     },
   ]
 
-  const menuItems = [
-    {
-      key: '/',
-      icon: <HomeOutlined />,
-      label: <Link to="/">首页</Link>,
-    },
-    {
-      key: '/heroes',
-      icon: <UserOutlined />,
-      label: <Link to="/heroes">英雄</Link>,
-    },
-    {
-      key: '/equipments',
-      icon: <ApiOutlined />,
-      label: <Link to="/equipments">装备</Link>,
-    },
-    {
-      key: '/hexes',
-      icon: <ThunderboltOutlined />,
-      label: <Link to="/hexes">海克斯</Link>,
-    },
+  const navItems = [
+    { path: '/', label: '首页', icon: <HomeOutlined /> },
+    { path: '/heroes', label: '英雄', icon: <CrownOutlined /> },
+    { path: '/equipments', label: '装备', icon: <ApiOutlined /> },
+    { path: '/hexes', label: '海克斯', icon: <ThunderboltOutlined /> },
   ]
 
-  const selectedKeys = [location.pathname]
-
   return (
-    <Layout className="min-h-screen">
-      <Header
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 1,
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          padding: '0 50px',
-        }}
-      >
-        <div className="demo-logo text-white text-xl font-bold mr-8">
-          {import.meta.env.VITE_APP_TITLE}
-        </div>
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          selectedKeys={selectedKeys}
-          items={menuItems}
-          style={{ flex: 1, minWidth: 0 }}
-        />
-        <div className="ml-auto">
-          <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-            <div className="flex items-center gap-2 cursor-pointer text-white hover:text-gray-200">
-              <Avatar size="small" icon={<UserOutlined />} />
-              <span>{user?.username || '用户'}</span>
-            </div>
-          </Dropdown>
+    <Layout className="min-h-screen basic-layout">
+      <Header className="custom-header">
+        <div className="header-content">
+          <div className="logo">
+            <span className="logo-icon">⚡</span>
+            <span className="logo-text">{import.meta.env.VITE_APP_TITLE}</span>
+          </div>
+          <nav className="nav-menu">
+            {navItems.map((item) => (
+              <div
+                key={item.path}
+                className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
+                onClick={() => navigate(item.path)}
+              >
+                <span className="nav-icon">{item.icon}</span>
+                <span className="nav-label">{item.label}</span>
+              </div>
+            ))}
+          </nav>
+          <div className="user-section">
+            <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={['click']}>
+              <div className="user-info">
+                <Avatar size="small" icon={<UserOutlined />} className="user-avatar" />
+                <span className="user-name">{user?.username || '用户'}</span>
+              </div>
+            </Dropdown>
+          </div>
         </div>
       </Header>
-      <Content className="p-6">
-        <div
-          style={{
-            padding: 24,
-            minHeight: 380,
-            background: colorBgContainer,
-            borderRadius: 8,
-          }}
-        >
-          <Outlet />
+      <Content className="p-6 content-area">
+        <div className="flex">
+          {/* 左侧留白区 */}
+          <div className="w-1/6 bg-gray-100 min-h-[calc(100vh-200px)] rounded-l-lg" />
+
+          {/* 中间内容区 */}
+          <div className="w-2/3 bg-white">
+            <div
+              style={{
+                padding: '24px 354px',
+                minHeight: 'calc(100vh - 74px)',
+              }}
+            >
+              <Outlet />
+            </div>
+          </div>
+
+          {/* 右侧留白区 */}
+          <div className="w-1/6 bg-gray-100 min-h-[calc(100vh-200px)] rounded-r-lg" />
         </div>
       </Content>
-      <Footer style={{ textAlign: 'center' }}>
-        杰哥的推荐出装 ©{new Date().getFullYear()} Created by Ant Design
+      <Footer style={{ textAlign: 'center', backgroundColor: '#B5B5B5', height: '30px', lineHeight: '30px', padding: '0', color: '#fff' }}>
+        杰哥的推荐出装 ©{new Date().getFullYear()} Created with ❤️
       </Footer>
     </Layout>
   )

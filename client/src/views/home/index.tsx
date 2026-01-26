@@ -63,7 +63,7 @@ const Home = () => {
 
   return (
     <div className="home-page">
-      <PageHeader title="欢迎来到海克斯大乱斗推荐出装" />
+      <PageHeader title="欢迎来到嚎哭深渊" />
 
       <Card className="quick-menus-card" bordered={false}>
         <Row gutter={[16, 16]}>
@@ -83,7 +83,7 @@ const Home = () => {
         </Row>
       </Card>
 
-      <Card title="热门英雄" className="hot-heroes-card" bordered={false}>
+      <Card title="最新英雄" className="hot-heroes-card" bordered={false}>
         {loading ? (
           <div className="loading-container">
             <Spin size="large" />

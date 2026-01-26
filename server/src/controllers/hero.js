@@ -1,4 +1,4 @@
-const { Hero, HeroEquipment, HeroHex, Equipment, Hex } = require('../models');
+const { Hero, HeroEquipment, HeroHex, Equipment, Hex, EquipmentBuild } = require('../models');
 const { Op } = require('sequelize');
 const Response = require('../utils/response');
 
@@ -29,7 +29,7 @@ function parseHeroList(heroes) {
  */
 class HeroController {
   /**
-   * 获取热门英雄
+   * 获取最新英雄
    */
   static async getHotHeroes(ctx) {
     const { limit = 6 } = ctx.query;
@@ -44,7 +44,7 @@ class HeroController {
       ctx.body = Response.success(parseHeroList(heroes));
     } catch (error) {
       console.error('Get hot heroes error:', error);
-      ctx.body = Response.serverError('获取热门英雄失败');
+      ctx.body = Response.serverError('获取最新英雄失败');
     }
   }
 
@@ -116,7 +116,8 @@ class HeroController {
 
         const filteredHeroes = allHeroes.filter(hero => {
           const heroTags = hero.tags ? JSON.parse(hero.tags) : [];
-          return tagList.some(tag => heroTags.includes(tag));
+          // 必须同时包含所有选中的标签（与关系）
+          return tagList.every(tag => heroTags.includes(tag));
         });
 
         // 手动分页
@@ -159,20 +160,30 @@ class HeroController {
     const { id } = ctx.params;
 
     try {
-      const hero = await Hero.findByPk(id, {
+      // 查询出装思路
+      const equipmentBuilds = await EquipmentBuild.findAll({
+        where: {
+          heroId: id,
+          status: 1
+        },
         include: [
           {
             model: HeroEquipment,
-            as: 'HeroEquipments',
+            as: 'BuildEquipments',
             include: [
               {
                 model: Equipment,
                 as: 'Equipment'
               }
             ],
-            where: { isRecommended: true },
-            required: false
-          },
+            order: [['priority', 'ASC']]
+          }
+        ],
+        order: [['priority', 'DESC']]
+      });
+
+      const hero = await Hero.findByPk(id, {
+        include: [
           {
             model: HeroHex,
             as: 'HeroHexes',
@@ -182,7 +193,6 @@ class HeroController {
                 as: 'Hex'
               }
             ],
-            where: { isRecommended: true },
             required: false
           }
         ]
@@ -196,29 +206,52 @@ class HeroController {
       // 解析标签并格式化数据
       const heroData = parseHeroTags(hero);
 
-      // 格式化推荐装备
-      heroData.recommendedEquipments = heroData.HeroEquipments
-        ? heroData.HeroEquipments.filter(he => he.Equipment)
+      // 格式化出装思路
+      heroData.equipmentBuilds = equipmentBuilds
+        .filter(build => build.BuildEquipments && build.BuildEquipments.length > 0)
+        .map(build => ({
+          id: build.id,
+          heroId: build.heroId,
+          name: build.name,
+          description: build.description,
+          priority: build.priority,
+          status: build.status,
+          equipments: build.BuildEquipments
+            .filter(he => he.Equipment)
             .map(he => ({
-              equipment: he.Equipment,
+              id: he.id,
+              buildId: he.buildId,
+              equipmentId: he.equipmentId,
               priority: he.priority,
-              description: he.description
+              description: he.description,
+              equipment: he.Equipment
             }))
-            .sort((a, b) => b.priority - a.priority)
-        : [];
+        }));
 
-      // 格式化推荐海克斯
-      heroData.recommendedHexes = heroData.HeroHexes
+      // 格式化推荐海克斯（兼容旧逻辑，使用 isRecommended 字段）
+      const recommendedHexes = heroData.HeroHexes
         ? heroData.HeroHexes.filter(hh => hh.Hex)
             .map(hh => ({
+              id: hh.id,
+              heroId: hh.heroId,
+              hexId: hh.hexId,
               hex: hh.Hex,
               priority: hh.priority,
               description: hh.description
             }))
-            .sort((a, b) => b.priority - a.priority)
         : [];
 
-      delete heroData.HeroEquipments;
+      heroData.recommendedHexes = recommendedHexes.sort((a, b) => {
+        // 按海克斯等级排序（棱彩1 > 黄金3 > 白银2）
+        const tierOrder = { 1: 3, 3: 2, 2: 1 };
+        const tierA = a.hex?.tier || 1;
+        const tierB = b.hex?.tier || 1;
+        const orderA = tierOrder[tierA] || 0;
+        const orderB = tierOrder[tierB] || 0;
+        if (orderA !== orderB) return orderB - orderA;
+        return a.priority - b.priority;
+      });
+
       delete heroData.HeroHexes;
 
       ctx.body = Response.success(heroData);
@@ -393,6 +426,189 @@ class HeroController {
     } catch (error) {
       console.error('Update hero hexes error:', error);
       ctx.body = Response.serverError('更新推荐海克斯失败');
+    }
+  }
+
+  // ==================== 出装思路相关 API ====================
+
+  /**
+   * 获取英雄的出装思路列表
+   */
+  static async getBuilds(ctx) {
+    const { id } = ctx.params;
+
+    try {
+      const hero = await Hero.findByPk(id);
+      if (!hero) {
+        ctx.body = Response.notFound('英雄不存在');
+        return;
+      }
+
+      const builds = await EquipmentBuild.findAll({
+        where: { heroId: id },
+        include: [
+          {
+            model: HeroEquipment,
+            as: 'BuildEquipments',
+            include: [
+              {
+                model: Equipment,
+                as: 'Equipment'
+              }
+            ],
+            order: [['priority', 'ASC']]
+          }
+        ],
+        order: [['priority', 'DESC']]
+      });
+
+      ctx.body = Response.success(builds);
+    } catch (error) {
+      console.error('Get builds error:', error);
+      ctx.body = Response.serverError('获取出装思路失败');
+    }
+  }
+
+  /**
+   * 创建出装思路
+   */
+  static async createBuild(ctx) {
+    const { id } = ctx.params;
+    const { name, description, priority = 0 } = ctx.request.body;
+
+    if (!name) {
+      ctx.body = Response.paramError('出装思路名称不能为空');
+      return;
+    }
+
+    try {
+      const hero = await Hero.findByPk(id);
+      if (!hero) {
+        ctx.body = Response.notFound('英雄不存在');
+        return;
+      }
+
+      const build = await EquipmentBuild.create({
+        heroId: id,
+        name,
+        description: description || null,
+        priority,
+        status: 1
+      });
+
+      ctx.body = Response.success(build, '创建出装思路成功');
+    } catch (error) {
+      console.error('Create build error:', error);
+      ctx.body = Response.serverError('创建出装思路失败');
+    }
+  }
+
+  /**
+   * 更新出装思路
+   */
+  static async updateBuild(ctx) {
+    const { id, buildId } = ctx.params;
+    const { name, description, priority } = ctx.request.body;
+
+    try {
+      const build = await EquipmentBuild.findOne({
+        where: { id: buildId, heroId: id }
+      });
+
+      if (!build) {
+        ctx.body = Response.notFound('出装思路不存在');
+        return;
+      }
+
+      await build.update({
+        name: name !== undefined ? name : build.name,
+        description: description !== undefined ? description : build.description,
+        priority: priority !== undefined ? priority : build.priority
+      });
+
+      ctx.body = Response.success(build, '更新出装思路成功');
+    } catch (error) {
+      console.error('Update build error:', error);
+      ctx.body = Response.serverError('更新出装思路失败');
+    }
+  }
+
+  /**
+   * 删除出装思路
+   */
+  static async deleteBuild(ctx) {
+    const { id, buildId } = ctx.params;
+
+    try {
+      const build = await EquipmentBuild.findOne({
+        where: { id: buildId, heroId: id }
+      });
+
+      if (!build) {
+        ctx.body = Response.notFound('出装思路不存在');
+        return;
+      }
+
+      // 删除关联的装备
+      await HeroEquipment.destroy({ where: { buildId } });
+
+      // 删除出装思路
+      await build.destroy();
+
+      ctx.body = Response.success(null, '删除出装思路成功');
+    } catch (error) {
+      console.error('Delete build error:', error);
+      ctx.body = Response.serverError('删除出装思路失败');
+    }
+  }
+
+  /**
+   * 更新出装思路中的装备
+   */
+  static async updateBuildEquipments(ctx) {
+    const { id, buildId } = ctx.params;
+    const { equipments } = ctx.request.body; // [{ equipmentId, priority, description }]
+
+    if (!Array.isArray(equipments)) {
+      ctx.body = Response.paramError('装备列表格式错误');
+      return;
+    }
+
+    try {
+      const build = await EquipmentBuild.findOne({
+        where: { id: buildId, heroId: id }
+      });
+
+      if (!build) {
+        ctx.body = Response.notFound('出装思路不存在');
+        return;
+      }
+
+      // 删除该出装思路的旧装备关联（同时删除可能存在的旧数据）
+      await HeroEquipment.destroy({
+        where: {
+          [Op.or]: [
+            { buildId },
+            { heroId: id, buildId: null } // 清理没有 buildId 的旧数据
+          ]
+        }
+      });
+
+      // 创建新的装备关联
+      const buildEquipments = await Promise.all(
+        equipments.map(e => HeroEquipment.create({
+          buildId,
+          heroId: id,
+          equipmentId: e.equipmentId,
+          priority: e.priority || 0,
+          description: e.description || null
+        }))
+      );
+
+      ctx.body = Response.success(buildEquipments, '更新出装思路装备成功');
+    } catch (error) {
+      console.error('Update build equipments error:', error);
+      ctx.body = Response.serverError('更新出装思路装备失败');
     }
   }
 }

@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react'
-import { Row, Col, Spin, Empty, Pagination } from 'antd'
+import { Row, Col, Spin, Empty, Pagination, Card } from 'antd'
 import HexCard from '@/components/HexCard'
 import PageHeader from '@/components/PageHeader'
 import SearchBar from '@/components/SearchBar'
 import { hexApi } from '@/api/hex'
 import { HexTierOptions } from '@/types/hex'
 import type { Hex } from '@/types/hex'
+import './HexList.css'
 
 const HexList = () => {
   const [hexes, setHexes] = useState<Hex[]>([])
   const [loading, setLoading] = useState(false)
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(12)
+  const [pageSize, setPageSize] = useState(18)
 
   useEffect(() => {
     fetchHexes()
@@ -25,6 +26,7 @@ const HexList = () => {
         page,
         pageSize,
         ...params,
+        tier: params?.tier, // 默认值为 1，如果 params 中没有 tier 或为 undefined/null，则使用默认值
       })
       if (res.code === 200 || res.code === 0) {
         setHexes(res.data?.list || [])
@@ -51,48 +53,53 @@ const HexList = () => {
   }
 
   return (
-    <div>
+    <div className="hex-list-page">
       <PageHeader
         title="海克斯列表"
         items={[{ title: '海克斯', path: '/hexes' }]}
       />
-      <SearchBar
-        onSearch={handleSearch}
-        searchPlaceholder="请输入海克斯名称"
-        filters={[
-          {
-            key: 'tier',
-            label: '海克斯等级',
-            options: HexTierOptions,
-          },
-        ]}
-      />
+      <div className="hex-list-search">
+        <SearchBar
+          onSearch={handleSearch}
+          searchPlaceholder="请输入海克斯名称"
+          filters={[
+            {
+              key: 'tier',
+              label: '海克斯等级',
+              type: 'radio',
+              options: HexTierOptions,
+            },
+          ]}
+        />
+      </div>
       {loading ? (
-        <div className="text-center py-8">
+        <div className="hex-list-loading">
           <Spin size="large" />
         </div>
       ) : hexes.length > 0 ? (
-        <>
-          <Row gutter={[16, 16]}>
+        <Card className="hex-list-content" bordered={false}>
+          <Row gutter={[16, 16]} align="stretch">
             {hexes.map((hex) => (
               <Col key={hex.id} xs={24} sm={12} md={8} lg={6} xl={4}>
                 <HexCard hex={hex} />
               </Col>
             ))}
           </Row>
-          <div className="mt-6 flex justify-center">
+          <div className="hex-list-pagination">
             <Pagination
               current={page}
               pageSize={pageSize}
               total={total}
               onChange={handlePageChange}
               showSizeChanger
-              showTotal={(total) => `共 ${total} 条`}
+              showTotal={(total) => `共 ${total} 个海克斯`}
             />
           </div>
-        </>
+        </Card>
       ) : (
-        <Empty description="暂无数据" />
+        <Card className="hex-list-content" bordered={false}>
+          <Empty description="暂无数据" />
+        </Card>
       )}
     </div>
   )

@@ -1,0 +1,27 @@
+.hex-list-page {
+  padding-bottom: 40px;
+}
+
+.hex-list-search {
+  margin-bottom: 24px;
+}
+
+.hex-list-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 0;
+}
+
+.hex-list-content {
+  border-radius: 16px !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+.hex-list-pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  /* padding-bottom: 16px; */
+}
+

@@ -1,4 +1,4 @@
-import { Breadcrumb, Typography } from 'antd'
+import { Breadcrumb, ConfigProvider, Typography } from 'antd'
 import { HomeOutlined } from '@ant-design/icons'
 
 const { Title } = Typography
@@ -32,15 +32,38 @@ const PageHeader = ({ title, items = [], extra }: PageHeaderProps) => {
   ]
 
   return (
-    <div className="page-header mb-6">
-      <Breadcrumb items={breadcrumbItems} className="mb-4" />
-      <div className="flex justify-between items-center">
-        <Title level={2} className="m-0">
-          {title}
-        </Title>
-        {extra}
-      </div>
-    </div>
+    <ConfigProvider
+      theme={{
+        components: {
+          Breadcrumb: {
+            /* 这里是你的组件 token */
+            linkColor: '#fff',
+            linkHoverColor: '#ffd700',
+          },
+        },
+      }}
+    >
+      <div className="page-header mb-6">
+          <Breadcrumb items={breadcrumbItems} className="mb-4" 
+          styles={{
+            item: {
+              color: '#fff',
+            },
+            root: {
+              color: '#fff',
+            },
+            separator: {
+              color: '#fff',
+            },
+          }} />
+          <div className="flex justify-between items-center text-white">
+            <Title level={2} className="m-0 text-white" style={{ color: '#fff' }}>
+              {title}
+            </Title>
+            {extra}
+          </div>
+        </div>
+    </ConfigProvider>
   )
 }
 

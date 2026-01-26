@@ -1,5 +1,5 @@
 import api from './index'
-import type { Hero, HeroParams, HeroFormData, PageResult } from '@/types/hero'
+import type { Hero, HeroParams, HeroFormData, PageResult, EquipmentBuild } from '@/types/hero'
 import type { ApiResponse } from '@/types/common'
 
 const BASE_URL = '/heroes'
@@ -30,7 +30,7 @@ export const heroApi = {
     return api.delete(`${BASE_URL}/${id}`)
   },
 
-  // 获取热门英雄
+  // 获取最新英雄
   getHotHeroes: (limit = 6) => {
     return api.get<Hero[]>(`${BASE_URL}/hot`, { limit })
   },
@@ -40,7 +40,36 @@ export const heroApi = {
     return api.get<Hero[]>(`${BASE_URL}/search/tags`, { tags })
   },
 
-  // 更新英雄推荐装备
+  // ==================== 出装思路相关 ====================
+
+  // 获取英雄的出装思路列表
+  getBuilds: (heroId: number) => {
+    return api.get<EquipmentBuild[]>(`${BASE_URL}/${heroId}/builds`)
+  },
+
+  // 创建出装思路
+  createBuild: (heroId: number, data: { name: string; description?: string; priority?: number }) => {
+    return api.post<EquipmentBuild>(`${BASE_URL}/${heroId}/builds`, data)
+  },
+
+  // 更新出装思路
+  updateBuild: (heroId: number, buildId: number, data: { name?: string; description?: string; priority?: number }) => {
+    return api.put<EquipmentBuild>(`${BASE_URL}/${heroId}/builds/${buildId}`, data)
+  },
+
+  // 删除出装思路
+  deleteBuild: (heroId: number, buildId: number) => {
+    return api.delete(`${BASE_URL}/${heroId}/builds/${buildId}`)
+  },
+
+  // 更新出装思路中的装备
+  updateBuildEquipments: (heroId: number, buildId: number, equipments: { equipmentId: number; priority: number; description?: string }[]) => {
+    return api.put(`${BASE_URL}/${heroId}/builds/${buildId}/equipments`, { equipments })
+  },
+
+  // ==================== 旧版兼容 API ====================
+
+  // 更新英雄推荐装备（已废弃，请使用出装思路相关 API）
   updateEquipments: (id: number, equipments: { equipmentId: number; priority?: number; description?: string }[]) => {
     return api.put(`${BASE_URL}/${id}/equipments`, { equipments })
   },

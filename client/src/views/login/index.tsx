@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Form, Input, Button, Card, message, Tabs } from 'antd'
-import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons'
+import { PhoneOutlined, LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
 import { useUserStore } from '@/store/user'
 import { authApi } from '@/api/auth'
 import './login.css'
@@ -12,7 +12,7 @@ const Login = () => {
   const { login } = useUserStore()
 
   // 登录
-  const onLoginFinish = async (values: { username: string; password: string }) => {
+  const onLoginFinish = async (values: { phone: string; password: string }) => {
     try {
       setLoading(true)
       const res = await authApi.login(values)
@@ -20,7 +20,7 @@ const Login = () => {
         const { token, user } = res.data
         login(user, token)
         message.success('登录成功')
-        navigate('/admin')
+        navigate('/')
       }
     } catch (error: any) {
       message.error(error.response?.data?.message || '登录失败')
@@ -30,7 +30,7 @@ const Login = () => {
   }
 
   // 注册
-  const onRegisterFinish = async (values: { username: string; password: string; email?: string }) => {
+  const onRegisterFinish = async (values: { username: string; phone: string; password: string; email?: string }) => {
     try {
       setLoading(true)
       const res = await authApi.register(values)
@@ -38,7 +38,7 @@ const Login = () => {
         const { token, user } = res.data
         login(user, token)
         message.success('注册成功')
-        navigate('/admin')
+        navigate('/')
       }
     } catch (error: any) {
       message.error(error.response?.data?.message || '注册失败')
@@ -55,12 +55,15 @@ const Login = () => {
       size="large"
     >
       <Form.Item
-        name="username"
-        rules={[{ required: true, message: '请输入用户名' }]}
+        name="phone"
+        rules={[
+          { required: true, message: '请输入手机号' },
+          { pattern: /^1[3-9]\d{9}$/, message: '请输入有效的手机号' }
+        ]}
       >
         <Input
-          prefix={<UserOutlined />}
-          placeholder="用户名"
+          prefix={<PhoneOutlined />}
+          placeholder="手机号"
         />
       </Form.Item>
 
@@ -98,12 +101,25 @@ const Login = () => {
         name="username"
         rules={[
           { required: true, message: '请输入用户名' },
-          { min: 3, message: '用户名至少3个字符' }
+          { min: 2, message: '用户名至少2个字符' }
         ]}
       >
         <Input
           prefix={<UserOutlined />}
-          placeholder="用户名（至少3个字符）"
+          placeholder="用户名"
+        />
+      </Form.Item>
+
+      <Form.Item
+        name="phone"
+        rules={[
+          { required: true, message: '请输入手机号' },
+          { pattern: /^1[3-9]\d{9}$/, message: '请输入有效的手机号' }
+        ]}
+      >
+        <Input
+          prefix={<PhoneOutlined />}
+          placeholder="手机号"
         />
       </Form.Item>
 

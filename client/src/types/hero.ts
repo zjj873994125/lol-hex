@@ -11,16 +11,42 @@ export interface Hero {
   status: number
   equipments?: HeroEquipment[]
   hexes?: HeroHex[]
-  recommendedEquipments?: HeroEquipment[]
-  recommendedHexes?: HeroHex[]
+  equipmentBuilds?: EquipmentBuild[]
   createdAt: string
   updatedAt: string
 }
 
+// 出装思路
+export interface EquipmentBuild {
+  id: number
+  heroId: number
+  name: string
+  description?: string
+  priority: number
+  status: number
+  equipments?: BuildEquipment[]
+  createdAt: string
+  updatedAt: string
+}
+
+// 出装思路中的装备
+export interface BuildEquipment {
+  id: number
+  buildId: number
+  equipmentId: number
+  priority: number
+  description?: string
+  equipment?: Equipment
+  createdAt: string
+  updatedAt: string
+}
+
+// 兼容旧版本，保留 HeroEquipment
 export interface HeroEquipment {
   id: number
   heroId: number
   equipmentId: number
+  buildId?: number
   priority: number
   description?: string
   equipment?: Equipment
@@ -78,3 +104,13 @@ export interface Hex {
   description: string
   status: number
 }
+
+// 英雄定位
+export const HeroPositionOptions = [
+  { label: '坦克', value: 'tank' },
+  { label: '战士', value: 'fighter' },
+  { label: '刺客', value: 'assassin' },
+  { label: '法师', value: 'mage' },
+  { label: '射手', value: 'marksman' },
+  { label: '辅助', value: 'support' },
+]

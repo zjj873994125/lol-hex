@@ -10,8 +10,7 @@ const User = sequelize.define('User', {
   },
   username: {
     type: DataTypes.STRING(50),
-    allowNull: false,
-    unique: true,
+    allowNull: true,
     comment: '用户名'
   },
   password: {
@@ -19,10 +18,22 @@ const User = sequelize.define('User', {
     allowNull: false,
     comment: '密码（bcrypt加密）'
   },
+  phone: {
+    type: DataTypes.STRING(20),
+    allowNull: false,
+    unique: true,
+    comment: '手机号（登录用）'
+  },
   email: {
     type: DataTypes.STRING(100),
     allowNull: true,
     comment: '邮箱'
+  },
+  avatar: {
+    type: DataTypes.STRING(500),
+    allowNull: true,
+    defaultValue: 'https://img.duoziwang.com/2018/18/06051452332913.jpg',
+    comment: '头像URL'
   },
   roleId: {
     type: DataTypes.INTEGER,
@@ -39,6 +50,7 @@ const User = sequelize.define('User', {
   tableName: 'users',
   indexes: [
     { fields: ['username'] },
+    { fields: ['phone'] },
     { fields: ['email'] },
     { fields: ['roleId'] },
     { fields: ['status'] }

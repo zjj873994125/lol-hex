@@ -10,17 +10,17 @@ class AuthController {
    * 用户登录
    */
   static async login(ctx) {
-    const { username, password } = ctx.request.body;
+    const { phone, password } = ctx.request.body;
 
-    if (!username || !password) {
-      ctx.body = Response.paramError('用户名和密码不能为空');
+    if (!phone || !password) {
+      ctx.body = Response.paramError('手机号和密码不能为空');
       return;
     }
 
     try {
       // 查找用户
       const user = await User.findOne({
-        where: { username },
+        where: { phone },
         include: [
           {
             model: Role,
@@ -37,7 +37,7 @@ class AuthController {
       });
 
       if (!user) {
-        ctx.body = Response.unauthorized('用户名或密码错误');
+        ctx.body = Response.unauthorized('手机号或密码错误');
         return;
       }
 
@@ -50,7 +50,7 @@ class AuthController {
       // 验证密码
       const isPasswordValid = await user.validatePassword(password);
       if (!isPasswordValid) {
-        ctx.body = Response.unauthorized('用户名或密码错误');
+        ctx.body = Response.unauthorized('手机号或密码错误');
         return;
       }
 
@@ -72,7 +72,7 @@ class AuthController {
       // 生成 Token（包含 roleCode）
       const token = JWTUtil.generate({
         id: user.id,
-        username: user.username,
+        phone: user.phone,
         roleId: user.roleId,
         roleCode
       });
@@ -82,7 +82,9 @@ class AuthController {
         user: {
           id: user.id,
           username: user.username,
+          phone: user.phone,
           email: user.email,
+          avatar: user.avatar,
           role: roleInfo,
           permissions
         }
@@ -97,18 +99,18 @@ class AuthController {
    * 用户注册
    */
   static async register(ctx) {
-    const { username, password, email } = ctx.request.body;
+    const { username, phone, password, email } = ctx.request.body;
 
-    if (!username || !password) {
-      ctx.body = Response.paramError('用户名和密码不能为空');
+    if (!username || !phone || !password) {
+      ctx.body = Response.paramError('用户名、手机号和密码不能为空');
       return;
     }
 
     try {
-      // 检查用户名是否已存在
-      const existingUser = await User.findOne({ where: { username } });
+      // 检查手机号是否已存在
+      const existingUser = await User.findOne({ where: { phone } });
       if (existingUser) {
-        ctx.body = Response.paramError('用户名已存在');
+        ctx.body = Response.paramError('该手机号已注册');
         return;
       }
 
@@ -127,8 +129,10 @@ class AuthController {
       // 创建用户
       const user = await User.create({
         username,
+        phone,
         password,
         email: email || null,
+        avatar: 'https://img.duoziwang.com/2018/18/06051452332913.jpg',
         roleId: defaultRole.id,
         status: 1
       });
@@ -136,7 +140,7 @@ class AuthController {
       // 生成 Token（包含 roleCode）
       const token = JWTUtil.generate({
         id: user.id,
-        username: user.username,
+        phone: user.phone,
         roleId: user.roleId,
         roleCode: defaultRole.code
       });
@@ -146,7 +150,9 @@ class AuthController {
         user: {
           id: user.id,
           username: user.username,
+          phone: user.phone,
           email: user.email,
+          avatar: user.avatar,
           role: {
             id: defaultRole.id,
             name: defaultRole.name,
@@ -214,7 +220,9 @@ class AuthController {
       ctx.body = Response.success({
         id: userData.id,
         username: userData.username,
+        phone: userData.phone,
         email: userData.email,
+        avatar: userData.avatar,
         status: userData.status,
         role: roleInfo,
         permissions,
@@ -223,6 +231,88 @@ class AuthController {
     } catch (error) {
       console.error('Get user info error:', error);
       ctx.body = Response.serverError('获取用户信息失败');
+    }
+  }
+
+  /**
+   * 更新个人信息
+   */
+  static async updateProfile(ctx) {
+    const user = ctx.state.user;
+    const { username, email, avatar } = ctx.request.body;
+
+    if (!user) {
+      ctx.body = Response.unauthorized('未登录');
+      return;
+    }
+
+    try {
+      const userData = await User.findByPk(user.id);
+
+      if (!userData) {
+        ctx.body = Response.notFound('用户不存在');
+        return;
+      }
+
+      await userData.update({
+        username: username !== undefined ? username : userData.username,
+        email: email !== undefined ? email : userData.email,
+        avatar: avatar !== undefined ? avatar : userData.avatar,
+      });
+
+      const updatedUser = userData.toJSON();
+      delete updatedUser.password;
+
+      ctx.body = Response.success(updatedUser, '更新成功');
+    } catch (error) {
+      console.error('Update profile error:', error);
+      ctx.body = Response.serverError('更新失败');
+    }
+  }
+
+  /**
+   * 修改密码
+   */
+  static async changePassword(ctx) {
+    const user = ctx.state.user;
+    const { oldPassword, newPassword } = ctx.request.body;
+
+    if (!user) {
+      ctx.body = Response.unauthorized('未登录');
+      return;
+    }
+
+    if (!oldPassword || !newPassword) {
+      ctx.body = Response.paramError('旧密码和新密码不能为空');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      ctx.body = Response.paramError('新密码至少6位');
+      return;
+    }
+
+    try {
+      const userData = await User.findByPk(user.id);
+
+      if (!userData) {
+        ctx.body = Response.notFound('用户不存在');
+        return;
+      }
+
+      // 验证旧密码
+      const isPasswordValid = await userData.validatePassword(oldPassword);
+      if (!isPasswordValid) {
+        ctx.body = Response.unauthorized('旧密码错误');
+        return;
+      }
+
+      await userData.update({ password: newPassword });
+
+      ctx.body = Response.success(null, '密码修改成功');
+    } catch (error) {
+      console.error('Change password error:', error);
+      ctx.body = Response.serverError('修改密码失败');
     }
   }
 }

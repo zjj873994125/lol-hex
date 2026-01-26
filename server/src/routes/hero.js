@@ -7,7 +7,7 @@ const router = new Router({
   prefix: '/api/heroes'
 });
 
-// 获取热门英雄（游客可访问）
+// 获取最新英雄（游客可访问）
 router.get('/hot', optionalAuth, HeroController.getHotHeroes);
 
 // 根据标签搜索英雄（游客可访问）
@@ -33,5 +33,22 @@ router.put('/:id/equipments', authMiddleware, adminMiddleware, HeroController.up
 
 // 更新英雄推荐海克斯（需要管理员权限）
 router.put('/:id/hexes', authMiddleware, adminMiddleware, HeroController.updateHexes);
+
+// ==================== 出装思路相关路由 ====================
+
+// 获取英雄的出装思路列表（需要管理员权限）
+router.get('/:id/builds', authMiddleware, adminMiddleware, HeroController.getBuilds);
+
+// 创建出装思路（需要管理员权限）
+router.post('/:id/builds', authMiddleware, adminMiddleware, HeroController.createBuild);
+
+// 更新出装思路（需要管理员权限）
+router.put('/:id/builds/:buildId', authMiddleware, adminMiddleware, HeroController.updateBuild);
+
+// 删除出装思路（需要管理员权限）
+router.delete('/:id/builds/:buildId', authMiddleware, adminMiddleware, HeroController.deleteBuild);
+
+// 更新出装思路中的装备（需要管理员权限）
+router.put('/:id/builds/:buildId/equipments', authMiddleware, adminMiddleware, HeroController.updateBuildEquipments);
 
 module.exports = router;

@@ -9,6 +9,7 @@ const HeroList = lazy(() => import('@/views/hero/HeroList'))
 const HeroDetail = lazy(() => import('@/views/hero/HeroDetail'))
 const EquipmentList = lazy(() => import('@/views/equipment/EquipmentList'))
 const HexList = lazy(() => import('@/views/hex/HexList'))
+const Profile = lazy(() => import('@/views/profile/index'))
 const Login = lazy(() => import('@/views/login/index'))
 
 // 管理页面
@@ -85,6 +86,10 @@ const router = createBrowserRouter([
       {
         path: 'hexes',
         element: <HexList />,
+      },
+      {
+        path: 'profile',
+        element: <Profile />,
       },
     ],
   },

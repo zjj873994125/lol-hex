@@ -7,6 +7,7 @@ const Equipment = require('./Equipment');
 const Hex = require('./Hex');
 const HeroEquipment = require('./HeroEquipment');
 const HeroHex = require('./HeroHex');
+const EquipmentBuild = require('./EquipmentBuild');
 
 // 定义关联关系
 
@@ -54,7 +55,15 @@ Menu.belongsToMany(Role, { through: RoleMenu, foreignKey: 'menuId', otherKey: 'r
 Menu.hasMany(Menu, { foreignKey: 'parentId', as: 'Children', constraints: false });
 Menu.belongsTo(Menu, { foreignKey: 'parentId', as: 'Parent', constraints: false });
 
-// Hero - HeroEquipment (一对多)
+// Hero - EquipmentBuild (一对多)
+Hero.hasMany(EquipmentBuild, { foreignKey: 'heroId', as: 'EquipmentBuilds' });
+EquipmentBuild.belongsTo(Hero, { foreignKey: 'heroId', as: 'Hero' });
+
+// EquipmentBuild - HeroEquipment (一对多)
+EquipmentBuild.hasMany(HeroEquipment, { foreignKey: 'buildId', as: 'BuildEquipments' });
+HeroEquipment.belongsTo(EquipmentBuild, { foreignKey: 'buildId', as: 'EquipmentBuild' });
+
+// Hero - HeroEquipment (一对多) - 保留兼容性
 Hero.hasMany(HeroEquipment, { foreignKey: 'heroId', as: 'HeroEquipments' });
 HeroEquipment.belongsTo(Hero, { foreignKey: 'heroId', as: 'Hero' });
 
@@ -81,6 +90,7 @@ const db = {
   Hex,
   HeroEquipment,
   HeroHex,
+  EquipmentBuild,
   UserRole,
   RoleMenu
 };

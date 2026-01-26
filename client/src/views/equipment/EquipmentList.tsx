@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Row, Col, Spin, Empty, Pagination } from 'antd'
+import { Row, Col, Spin, Empty, Pagination, Card } from 'antd'
 import EquipmentCard from '@/components/EquipmentCard'
 import PageHeader from '@/components/PageHeader'
 import SearchBar from '@/components/SearchBar'
@@ -12,10 +12,11 @@ const EquipmentList = () => {
   const [loading, setLoading] = useState(false)
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
-  const [pageSize] = useState(24) // 一页24个，2行每行12个
+  const [pageSize, setPageSize] = useState(48) // 一页60个
 
   useEffect(() => {
     fetchEquipments()
+    console.log(page, pageSize)
   }, [page, pageSize])
 
   const fetchEquipments = async (params?: { keyword?: string }) => {
@@ -48,6 +49,11 @@ const EquipmentList = () => {
     setPage(newPage)
   }
 
+  const handlePageSizeChange = (current: number, size: number) => {
+    setPageSize(size)
+    setPage(1) // 改变每页数量时重置到第一页
+  }
+
   return (
     <div className="equipment-list-page">
       <PageHeader title="装备列表" items={[{ title: '装备', path: '/equipments' }]} />
@@ -59,7 +65,7 @@ const EquipmentList = () => {
           <Spin size="large" />
         </div>
       ) : equipments.length > 0 ? (
-        <>
+        <Card className="equipment-list-content" bordered={false}>
           <Row gutter={[12, 12]} align="stretch">
             {equipments.map((equipment) => (
               <Col key={equipment.id} xs={4} sm={3} md={2} lg={2} xl={2}>
@@ -73,12 +79,16 @@ const EquipmentList = () => {
               pageSize={pageSize}
               total={total}
               onChange={handlePageChange}
+              onShowSizeChange={handlePageSizeChange}
+              showSizeChanger
               showTotal={(total) => `共 ${total} 件装备`}
             />
           </div>
-        </>
+        </Card>
       ) : (
-        <Empty description="暂无数据" className="equipment-list-empty" />
+        <Card className="equipment-list-content" bordered={false}>
+          <Empty description="暂无数据" />
+        </Card>
       )}
     </div>
   )

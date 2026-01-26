@@ -1,11 +1,19 @@
-import { Input, Select, Button, Space } from 'antd'
+import { Input, Select, Button, Space, Radio, Checkbox } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
-import { useState } from 'react'
+import { useState, useImperativeHandle, forwardRef } from 'react'
+import './SearchBar.css'
+
+export interface SearchBarRef {
+  search: () => void
+  reset: () => void
+}
 
 interface SearchOption {
   label: string
   value: string | number
 }
+
+type FilterType = 'select' | 'select-multi' | 'radio' | 'checkbox'
 
 interface SearchBarProps {
   onSearch: (keyword: string, filters?: Record<string, any>) => void
@@ -13,33 +21,115 @@ interface SearchBarProps {
   filters?: Array<{
     key: string
     label: string
+    type?: FilterType
     options: SearchOption[]
+    defaultValue?: any
   }>
 }
 
-const SearchBar = ({
+const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(({
   onSearch,
   searchPlaceholder = '请输入关键词',
   filters = [],
-}: SearchBarProps) => {
+}, ref) => {
   const [keyword, setKeyword] = useState('')
   const [activeFilters, setActiveFilters] = useState<Record<string, any>>({})
 
-  const handleSearch = () => {
-    onSearch(keyword, activeFilters)
+  const handleSearch = (searchKeyword?: string, searchFilters?: Record<string, any>) => {
+    const finalKeyword = searchKeyword ?? keyword
+    const finalFilters = searchFilters ?? activeFilters
+    onSearch(finalKeyword, finalFilters)
   }
 
-  const handleFilterChange = (key: string, value: any) => {
-    setActiveFilters((prev) => ({
-      ...prev,
+  useImperativeHandle(ref, () => ({
+    search: handleSearch,
+    reset: handleReset,
+  }))
+
+  const handleFilterChange = (key: string, value: any, triggerSearch = false) => {
+    const newFilters = {
+      ...activeFilters,
       [key]: value,
-    }))
+    }
+    setActiveFilters(newFilters)
+    if (triggerSearch) {
+      handleSearch(keyword, newFilters)
+    }
   }
 
   const handleReset = () => {
     setKeyword('')
     setActiveFilters({})
     onSearch('', {})
+  }
+
+  const renderFilter = (filter: { key: string; label: string; type?: FilterType; options: SearchOption[]; defaultValue?: any }) => {
+    const type = filter.type || 'select'
+    const value = activeFilters[filter.key]
+    const defaultValue = filter.defaultValue ?? null
+    switch (type) {
+      case 'radio':
+        return (
+          <div className="filter-radio-group">
+            {/* <span className="filter-label">{filter.label}:</span> */}
+            <Radio.Group
+              value={value ?? defaultValue}
+              onChange={(e) => handleFilterChange(filter.key, e.target.value, true)}
+              optionType="button"
+              buttonStyle="solid"
+              // styles={{
+              //   label: {
+              //     color: '#000',
+              //   },
+              // }}
+            >
+              {filter.options.map((option) => (
+                <Radio.Button style={{ color: '#000' }} key={option.value} value={option.value}>
+                  {option.label}
+                </Radio.Button>
+              ))}
+            </Radio.Group>
+          </div>
+        )
+
+      case 'checkbox':
+        return (
+          <div className="filter-checkbox-group">
+            {/* <span className="filter-label">{filter.label}:</span> */}
+            <Checkbox.Group
+              value={value || []}
+              onChange={(values) => handleFilterChange(filter.key, values, true)}
+              options={filter.options.map((opt) => ({ label: opt.label, value: opt.value }))}
+            />
+          </div>
+        )
+
+      case 'select-multi':
+        return (
+          <Select
+            placeholder={filter.label}
+            value={value}
+            onChange={(val) => handleFilterChange(filter.key, val)}
+            allowClear
+            mode="multiple"
+            style={{ width: 180 }}
+            options={filter.options}
+          />
+        )
+
+      case 'select':
+      default:
+        return (
+          <Select
+            placeholder={filter.label}
+            value={value}
+            onChange={(val) => handleFilterChange(filter.key, val)}
+            allowClear
+            style={{ width: 150 }}
+            options={filter.options}
+          />
+        )
+    }
   }
 
   return (
@@ -54,15 +144,7 @@ const SearchBar = ({
           style={{ width: 200 }}
         />
         {filters.map((filter) => (
-          <Select
-            key={filter.key}
-            placeholder={filter.label}
-            value={activeFilters[filter.key]}
-            onChange={(value) => handleFilterChange(filter.key, value)}
-            allowClear
-            style={{ width: 150 }}
-            options={filter.options}
-          />
+          <div key={filter.key}>{renderFilter(filter)}</div>
         ))}
         <Button
           type="primary"
@@ -75,6 +157,8 @@ const SearchBar = ({
       </Space>
     </div>
   )
-}
+})
+
+SearchBar.displayName = 'SearchBar'
 
 export default SearchBar
