@@ -348,20 +348,23 @@ const HeroManage = () => {
     }
   }
 
-  // 添加海克斯到已选列表
-  const addHex = (hex: Hex) => {
-    if (selectedHexes.some((item) => item.hexId === hex.id)) {
-      message.warning('该海克斯已添加')
-      return
+  // 添加/移除海克斯（点击切换）
+  const toggleHex = (hex: Hex) => {
+    const existingIndex = selectedHexes.findIndex((item) => item.hexId === hex.id)
+    if (existingIndex >= 0) {
+      // 已选中，移除
+      setSelectedHexes(selectedHexes.filter((_, i) => i !== existingIndex))
+    } else {
+      // 未选中，添加
+      setSelectedHexes([
+        ...selectedHexes,
+        {
+          hexId: hex.id,
+          priority: 1,
+          description: '',
+        },
+      ])
     }
-    setSelectedHexes([
-      ...selectedHexes,
-      {
-        hexId: hex.id,
-        priority: 1,
-        description: '',
-      },
-    ])
   }
 
   // 移除海克斯
@@ -753,7 +756,7 @@ const HeroManage = () => {
                       <div
                         key={hex.id}
                         className={`hex-option-item ${isSelected ? 'hex-option-selected' : ''}`}
-                        onClick={() => addHex(hex)}
+                        onClick={() => toggleHex(hex)}
                       >
                         <div
                           className="hex-option-icon"
@@ -779,54 +782,75 @@ const HeroManage = () => {
         </div>
         <div className="selected-hexes-section">
           <div className="selected-hexes-title">已选择的海克斯：</div>
-          <div className="selected-hexes-list">
-            {selectedHexes.map((item, index) => {
+          {[
+            { tier: 3, label: '黄金', color: '#ffd700' },
+            { tier: 2, label: '白银', color: '#c0c0c0' },
+            { tier: 1, label: '棱彩', color: '#0ac8b9' },
+          ].map((tierInfo) => {
+            const tierSelectedHexes = selectedHexes.filter((item) => {
               const hex = hexes.find((h) => h.id === item.hexId)
-              const priorityContent = (
-                <div className="priority-popover">
-                  {[1, 2, 3].map((p) => (
-                    <div
-                      key={p}
-                      className={`priority-option ${item.priority === p ? 'priority-option-active' : ''}`}
-                      onClick={() => updateHexPriority(index, p)}
-                    >
-                      {p}
-                    </div>
-                  ))}
+              return hex?.tier === tierInfo.tier
+            })
+            if (tierSelectedHexes.length === 0) return null
+            return (
+              <div key={tierInfo.tier} className="selected-tier-group">
+                <div className="selected-tier-title" style={{ color: tierInfo.color }}>
+                  {tierInfo.label}海克斯
                 </div>
-              )
+                <div className="selected-hexes-list">
+                  {tierSelectedHexes.map((item, idx) => {
+                    // 找到该海克斯在原始selectedHexes中的索引
+                    const originalIndex = selectedHexes.indexOf(item)
+                    const hex = hexes.find((h) => h.id === item.hexId)
+                    const priorityContent = (
+                      <div className="priority-popover">
+                        {[1, 2, 3].map((p) => (
+                          <div
+                            key={p}
+                            className={`priority-option ${item.priority === p ? 'priority-option-active' : ''}`}
+                            onClick={() => updateHexPriority(originalIndex, p)}
+                          >
+                            {p}
+                          </div>
+                        ))}
+                      </div>
+                    )
 
-              return (
-                <div key={index} className="selected-hex-item">
-                  <span className="selected-hex-name">
-                    {hex?.name || '未知'}
-                  </span>
-                  <Popover
-                    content={priorityContent}
-                    trigger="click"
-                    placement="top"
-                    overlayClassName="priority-popover-overlay"
-                  >
-                    <div className={`priority-circle priority-${item.priority || 0}`}>
-                      {item.priority || '-'}
-                    </div>
-                  </Popover>
-                  <Button
-                    type="text"
-                    danger
-                    size="small"
-                    icon={<DeleteOutlined />}
-                    onClick={() => removeHex(index)}
-                  >
-                    移除
-                  </Button>
+                    return (
+                      <div key={originalIndex} className="selected-hex-item">
+                        <img src={hex?.icon} alt="" className="selected-hex-icon" />
+                        <span className="selected-hex-name">
+                          {hex?.name || '未知'}
+                        </span>
+                        <Popover
+                          content={priorityContent}
+                          trigger="click"
+                          placement="top"
+                          overlayClassName="priority-popover-overlay"
+                        >
+                          <div className={`priority-circle priority-${item.priority || 0}`}>
+                            {item.priority || '-'}
+                          </div>
+                        </Popover>
+                        <Button
+                          type="text"
+                          danger
+                          size="small"
+                          icon={<DeleteOutlined />}
+                          onClick={() => removeHex(originalIndex)}
+                        >
+                          移除
+                        </Button>
+                      </div>
+                    )
+                  })}
                 </div>
-              )
-            })}
-            {selectedHexes.length === 0 && (
-              <div className="selected-hexes-empty">未选择任何海克斯</div>
-            )}
-          </div>
+              </div>
+            )
+          })}
+          {selectedHexes.length === 0 && (
+            <div className="selected-hexes-empty">未选择任何海克斯</div>
+          )}
         </div>
       </Modal>
     </div>
