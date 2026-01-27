@@ -226,6 +226,7 @@ const MenuManage = () => {
             新增菜单
           </Button>
         }
+        blackColor={true}
       />
       <Table
         columns={columns}

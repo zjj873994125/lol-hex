@@ -184,6 +184,7 @@ const RoleManage = () => {
             新增角色
           </Button>
         }
+        blackColor={true}
       />
       <Table
         columns={columns}

@@ -201,6 +201,7 @@ const UserManage = () => {
             新增用户
           </Button>
         }
+        blackColor={true}
       />
       <Table
         columns={columns}
