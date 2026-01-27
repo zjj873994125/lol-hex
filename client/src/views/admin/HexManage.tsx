@@ -13,7 +13,7 @@ import {
   Tag,
   Badge,
 } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import PageHeader from '@/components/PageHeader'
 import { hexApi } from '@/api/hex'
@@ -27,10 +27,22 @@ const HexManage = () => {
   const [editingHex, setEditingHex] = useState<Hex | null>(null)
   const [form] = Form.useForm()
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 })
+  const [searchKeyword, setSearchKeyword] = useState('')
+  const [searchTier, setSearchTier] = useState<number | undefined>(undefined)
 
   useEffect(() => {
     fetchHexes()
-  }, [pagination.current, pagination.pageSize])
+  }, [pagination.current, pagination.pageSize, searchKeyword, searchTier])
+
+  const handleSearch = () => {
+    setPagination((prev) => ({ ...prev, current: 1 }))
+  }
+
+  const handleReset = () => {
+    setSearchKeyword('')
+    setSearchTier(undefined)
+    setPagination((prev) => ({ ...prev, current: 1 }))
+  }
 
   const fetchHexes = async () => {
     try {
@@ -38,6 +50,8 @@ const HexManage = () => {
       const res = await hexApi.getList({
         page: pagination.current,
         pageSize: pagination.pageSize,
+        keyword: searchKeyword || undefined,
+        tier: searchTier,
       })
       if (res.code === 200 || res.code === 0) {
         setHexes(res.data?.list || [])
@@ -141,12 +155,13 @@ const HexManage = () => {
     {
       title: '操作',
       key: 'action',
-      width: 150,
+      width: 200,
       fixed: 'right',
       render: (_, record) => (
-        <Space>
+        <Space size={0} wrap>
           <Button
             type="link"
+            size="small"
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
           >
@@ -156,7 +171,7 @@ const HexManage = () => {
             title="确定删除？"
             onConfirm={() => handleDelete(record.id)}
           >
-            <Button type="link" danger icon={<DeleteOutlined />}>
+            <Button type="link" size="small" danger icon={<DeleteOutlined />}>
               删除
             </Button>
           </Popconfirm>
@@ -170,13 +185,33 @@ const HexManage = () => {
       <PageHeader
         title="海克斯管理"
         items={[{ title: '管理后台', path: '/admin' }, { title: '海克斯管理' }]}
-        extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-            新增海克斯
-          </Button>
-        }
         blackColor={true}
       />
+      <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
+        <div>
+          <Input.Search
+            placeholder="搜索海克斯名称"
+            allowClear
+            style={{ width: 300, marginRight: 10 }}
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
+            onSearch={handleSearch}
+            enterButton={<SearchOutlined />}
+          />
+          <Select
+            placeholder="选择等级"
+            allowClear
+            style={{ width: 120, marginRight: 10 }}
+            value={searchTier}
+            onChange={setSearchTier}
+            options={HexTierOptions}
+          />
+          <Button onClick={handleReset}>重置</Button>
+        </div>
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+          新增海克斯
+        </Button>
+      </div>
       <Table
         columns={columns}
         dataSource={hexes}

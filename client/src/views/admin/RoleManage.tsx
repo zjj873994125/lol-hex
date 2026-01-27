@@ -149,12 +149,13 @@ const RoleManage = () => {
     {
       title: '操作',
       key: 'action',
-      width: 200,
+      width: 150,
       fixed: 'right',
       render: (_, record) => (
-        <Space>
+        <Space size={0} wrap>
           <Button
             type="link"
+            size="small"
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
           >
@@ -164,7 +165,7 @@ const RoleManage = () => {
             title="确定删除？"
             onConfirm={() => handleDelete(record.id)}
           >
-            <Button type="link" danger icon={<DeleteOutlined />}>
+            <Button type="link" size="small" danger icon={<DeleteOutlined />}>
               删除
             </Button>
           </Popconfirm>

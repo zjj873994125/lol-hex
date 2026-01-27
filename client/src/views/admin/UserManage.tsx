@@ -11,6 +11,7 @@ import {
   message,
   Switch,
   Tag,
+  Avatar,
 } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
@@ -28,6 +29,12 @@ const UserManage = () => {
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [form] = Form.useForm()
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 })
+  const [previewAvatar, setPreviewAvatar] = useState<string>('')
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = e.target.value
+    setPreviewAvatar(url)
+  }
 
   useEffect(() => {
     fetchUsers()
@@ -76,8 +83,9 @@ const UserManage = () => {
     setEditingUser(user)
     form.setFieldsValue({
       ...user,
-      roleIds: user.roles?.map((r) => r.id),
+      // roleIds: user.roles?.map((r) => r.id),
     })
+    setPreviewAvatar(user.avatar || '')
     setModalVisible(true)
   }
 
@@ -161,9 +169,10 @@ const UserManage = () => {
       width: 150,
       fixed: 'right',
       render: (_, record) => (
-        <Space>
+        <Space size={0} wrap>
           <Button
             type="link"
+            size="small"
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
           >
@@ -173,7 +182,7 @@ const UserManage = () => {
             title="确定删除？"
             onConfirm={() => handleDelete(record.id)}
           >
-            <Button type="link" danger icon={<DeleteOutlined />}>
+            <Button type="link" size="small" danger icon={<DeleteOutlined />}>
               删除
             </Button>
           </Popconfirm>
@@ -224,6 +233,9 @@ const UserManage = () => {
           >
             <Input placeholder="请输入用户名" />
           </Form.Item>
+          <Form.Item name="phone" label="手机号" rules={[{ required: true, message: '请输入手机号' }]}>
+            <Input placeholder="请输入手机号" disabled={!!editingUser} />
+          </Form.Item>
           {!editingUser && (
             <Form.Item
               name="password"
@@ -236,13 +248,25 @@ const UserManage = () => {
           <Form.Item name="email" label="邮箱">
             <Input placeholder="请输入邮箱" />
           </Form.Item>
-          <Form.Item name="roleIds" label="角色">
+          <Form.Item name="roleId" label="角色">
             <Select
-              mode="multiple"
               options={roles.map((r) => ({ label: r.name, value: r.id }))}
               placeholder="请选择角色"
+              style={{ width: '100%' }}
             />
           </Form.Item>
+          <Form.Item label="头像URL" name="avatar">
+              <Input
+                placeholder="请输入头像图片链接"
+                onChange={handleAvatarChange}
+              />
+            </Form.Item>
+            {previewAvatar && (
+              <div className="avatar-preview">
+                <span>头像预览：</span>
+                <Avatar size={48} src={previewAvatar} />
+              </div>
+            )}
           <Form.Item
             name="status"
             label="状态"

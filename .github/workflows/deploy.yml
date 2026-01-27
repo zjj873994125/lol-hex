@@ -1,0 +1,136 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:  # 允许手动触发
+
+env:
+  PROJECT_NAME: "海克斯大乱斗"
+  SERVER_PORT: 22
+  WORK_DIR: /root/docker/lol-hex-lite/lol-hex
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📢 Deploy Start Notification
+        run: |
+          curl -X POST "${{ secrets.DINGTALK_WEBHOOK }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "msgtype": "markdown",
+              "markdown": {
+                "title": "🚀 开始部署",
+                "text": "### 🚀 ${{ env.PROJECT_NAME }} - 开始部署\n\n> **环境**: 生产环境\n> **分支**: ${{ github.ref_name }}\n> **提交人**: ${{ github.actor }}\n> **提交信息**: ${{ github.event.head_commit.message }}\n> **时间部署开始"
+              }
+            }'
+
+      - name: 📦 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: 🚀 Deploy to Server
+        run: |
+          echo ">>> 开始部署到服务器..."
+
+          # SSH 连接服务器执行部署
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_HOST }} << 'ENDSSH'
+            cd /root/docker/lol-hex-lite/lol-hex
+
+            # 发送开始通知
+            TIMESTAMP=$(date +%s)000
+            SIGN=$(printf '%s\n%s' "$TIMESTAMP" "${{ secrets.DINGTALK_SECRET }}" | openssl dgst -sha256 -hmac "${{ secrets.DINGTALK_SECRET }}" -binary | openssl base64 | tr -d '\n')
+            SIGN_ENCODED=$(echo -n "$SIGN" | jq -sRr @uri)
+            curl -X POST "${{ secrets.DINGTALK_WEBHOOK }}&timestamp=${TIMESTAMP}&sign=${SIGN_ENCODED}" \
+              -H "Content-Type: application/json" \
+              -d '{"msgtype":"text","text":{"content":"🚀 开始部署..."}}'
+
+            # 拉取最新代码
+            git pull origin master
+
+            # 构建并重启容器
+            docker stop lol-hex 2>/dev/null || true
+            docker rm lol-hex 2>/dev/null || true
+            docker build -t lol-hex:latest .
+            docker run -d \
+              --name lol-hex \
+              --env-file /root/docker/lol-hex-lite/lol-hex/server/.env \
+              -p 28080:80 \
+              -p 28899:8899 \
+              --restart unless-stopped \
+              lol-hex:latest
+
+            # 等待服务启动
+            sleep 10
+
+            # 健康检查
+            if curl -f -s http://localhost:28899/health > /dev/null; then
+              echo "✓ 部署成功"
+
+              # 发送成功通知
+              TIMESTAMP=$(date +%s)000
+              SIGN=$(printf '%s\n%s' "$TIMESTAMP" "${{ secrets.DINGTALK_SECRET }}" | openssl dgst -sha256 -hmac "${{ secrets.DINGTALK_SECRET }}" -binary | openssl base64 | tr -d '\n')
+              SIGN_ENCODED=$(echo -n "$SIGN" | jq -sRr @uri)
+              curl -X POST "${{ secrets.DINGTALK_WEBHOOK }}&timestamp=${TIMESTAMP}&sign=${SIGN_ENCODED}" \
+                -H "Content-Type: application/json" \
+                -d '{
+                  "msgtype": "markdown",
+                  "markdown": {
+                    "title": "✅ 部署成功",
+                    "text": "### ✅ ${{ env.PROJECT_NAME }} - 部署成功\n\n> **环境**: 生产环境\n> **提交人**: ${{ github.actor }}\n> **访问地址**: http://101.42.154.80:28080"
+                  }
+                }'
+            else
+              echo "✗ 部署失败"
+
+              # 发送失败通知
+              TIMESTAMP=$(date +%s)000
+              SIGN=$(printf '%s\n%s' "$TIMESTAMP" "${{ secrets.DINGTALK_SECRET }}" | openssl dgst -sha256 -hmac "${{ secrets.DINGTALK_SECRET }}" -binary | openssl base64 | tr -d '\n')
+              SIGN_ENCODED=$(echo -n "$SIGN" | jq -sRr @uri)
+              curl -X POST "${{ secrets.DINGTALK_WEBHOOK }}&timestamp=${TIMESTAMP}&sign=${SIGN_ENCODED}" \
+                -H "Content-Type: application/json" \
+                -d '{
+                  "msgtype": "markdown",
+                  "markdown": {
+                    "title": "❌ 部署失败",
+                    "text": "### ❌ ${{ env.PROJECT_NAME }} - 部署失败\n\n> **错误**: 健康检查失败\n\n@请检查！"
+                  }
+                }'
+              exit 1
+            fi
+          ENDSSH
+
+      - name: ✅ Deploy Success Notification
+        if: success()
+        run: |
+          curl -X POST "${{ secrets.DINGTALK_WEBHOOK }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "msgtype": "markdown",
+              "markdown": {
+                "title": "✅ 部署成功",
+                "text": "### ✅ GitHub Actions 部署完成\n\n> **项目**: ${{ env.PROJECT_NAME }}\n> **提交人**: ${{ github.actor }}\n> **访问地址**: http://101.42.154.80:28080"
+              }
+            }'
+
+      - name: ❌ Deploy Failure Notification
+        if: failure()
+        run: |
+          curl -X POST "${{ secrets.DINGTALK_WEBHOOK }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "msgtype": "markdown",
+              "markdown": {
+                "title": "❌ 部署失败",
+                "text": "### ❌ GitHub Actions 部署失败\n\n> **项目**: ${{ env.PROJECT_NAME }}\n> **提交人**: ${{ github.actor }}\n> **错误**: 请查看 GitHub Actions 日志\n\n@请检查！"
+              }
+            }'

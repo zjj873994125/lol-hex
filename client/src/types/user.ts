@@ -29,7 +29,7 @@ export interface UserFormData {
   password?: string
   email?: string
   status: number
-  roleIds?: number[]
+  roleId?: number
 }
 
 export interface LoginParams {

@@ -25,6 +25,12 @@ async function initDefaultData() {
     });
     console.log(`✓ 角色 [管理员] ${adminRole.isNewRecord ? '创建成功' : '已存在'}`);
 
+    const [contentRole] = await Role.findOrCreate({
+      where: { code: 'content_admin' },
+      defaults: { name: '内容管理员', code: 'content_admin', description: '内容管理员，只能管理英雄、装备、海克斯' }
+    });
+    console.log(`✓ 角色 [内容管理员] ${contentRole.isNewRecord ? '创建成功' : '已存在'}`);
+
     const [userRole] = await Role.findOrCreate({
       where: { code: 'user' },
       defaults: { name: '普通用户', code: 'user', description: '普通用户，只能查看数据' }
@@ -65,6 +71,16 @@ async function initDefaultData() {
       });
     }
     console.log('✓ 管理员角色菜单权限分配完成');
+
+    // 内容管理员只能管理英雄、装备、海克斯
+    const contentMenuIds = [1, 2, 3, 4];  // 系统管理 + 英雄 + 装备 + 海克斯
+    for (const menuId of contentMenuIds) {
+      await RoleMenu.findOrCreate({
+        where: { roleId: contentRole.id, menuId },
+        defaults: { roleId: contentRole.id, menuId }
+      });
+    }
+    console.log('✓ 内容管理员角色菜单权限分配完成');
 
     // 普通用户只读权限（暂时不给菜单，可根据需要添加）
     // const userMenuIds = [];

@@ -32,7 +32,19 @@ const isAdmin = () => {
   if (!userStr) return false
   try {
     const user = JSON.parse(userStr)
-    return user.role?.code === 'admin'
+    return user.role?.code === 'admin' || user.role?.code === 'content_admin'
+  } catch {
+    return false
+  }
+}
+
+// 检查是否有特定权限
+const hasPermission = (permission: string) => {
+  const userStr = localStorage.getItem('hex_user')
+  if (!userStr) return false
+  try {
+    const user = JSON.parse(userStr)
+    return user.permissions?.includes(permission)
   } catch {
     return false
   }

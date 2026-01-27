@@ -173,8 +173,9 @@ const MenuManage = () => {
       width: 200,
       fixed: 'right',
       render: (_, record) => (
-        <Space>
+        <Space size={0} wrap>
           <Button
+            type="link"
             size="small"
             onClick={() => handleAdd(record.id)}
           >

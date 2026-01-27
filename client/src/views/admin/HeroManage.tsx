@@ -19,6 +19,7 @@ import {
   Tabs,
   Empty,
 } from 'antd'
+import { SearchOutlined } from '@ant-design/icons'
 import {
   PlusOutlined,
   EditOutlined,
@@ -74,6 +75,7 @@ const HeroManage = () => {
   const [form] = Form.useForm()
   const [buildsForm] = Form.useForm()
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 })
+  const [searchKeyword, setSearchKeyword] = useState('')
 
   // 装备和海克斯选项
   const [equipments, setEquipments] = useState<Equipment[]>([])
@@ -89,7 +91,18 @@ const HeroManage = () => {
     fetchHeroes()
     fetchEquipments()
     fetchHexes()
-  }, [pagination.current, pagination.pageSize])
+  }, [pagination.current, pagination.pageSize, searchKeyword])
+
+  // 搜索处理
+  const handleSearch = (value: string) => {
+    setSearchKeyword(value)
+    setPagination((prev) => ({ ...prev, current: 1 }))
+  }
+
+  const handleReset = () => {
+    setSearchKeyword('')
+    setPagination((prev) => ({ ...prev, current: 1 }))
+  }
 
   const fetchHeroes = async () => {
     try {
@@ -97,6 +110,7 @@ const HeroManage = () => {
       const res = await heroApi.getList({
         page: pagination.current,
         pageSize: pagination.pageSize,
+        keyword: searchKeyword || undefined,
       })
       if (res.code === 200 || res.code === 0) {
         setHeroes(res.data?.list || [])
@@ -420,12 +434,13 @@ const HeroManage = () => {
     {
       title: '操作',
       key: 'action',
-      width: 340,
+      width: 200,
       fixed: 'right',
       render: (_, record) => (
-        <Space size="small">
+        <Space size={0} wrap>
           <Button
             type="link"
+            size="small"
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
           >
@@ -433,6 +448,7 @@ const HeroManage = () => {
           </Button>
           <Button
             type="link"
+            size="small"
             icon={<RocketOutlined />}
             onClick={() => openBuildModal(record)}
           >
@@ -440,6 +456,7 @@ const HeroManage = () => {
           </Button>
           <Button
             type="link"
+            size="small"
             icon={<ThunderboltOutlined />}
             onClick={() => openHexModal(record)}
           >
@@ -449,7 +466,7 @@ const HeroManage = () => {
             title="确定删除？"
             onConfirm={() => handleDelete(record.id)}
           >
-            <Button type="link" danger icon={<DeleteOutlined />}>
+            <Button type="link" size="small" danger icon={<DeleteOutlined />}>
               删除
             </Button>
           </Popconfirm>
@@ -463,13 +480,25 @@ const HeroManage = () => {
       <PageHeader
         title="英雄管理"
         items={[{ title: '管理后台', path: '/admin' }, { title: '英雄管理' }]}
-        extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-            新增英雄
-          </Button>
-        }
         blackColor={true}
       />
+      <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
+        <div>
+          <Input.Search
+            placeholder="搜索英雄名称、称号、昵称"
+            allowClear
+            style={{ width: 300, marginRight: 10 }}
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
+            onSearch={handleSearch}
+            enterButton={<SearchOutlined />}
+          />
+          <Button onClick={handleReset}>重置</Button>
+        </div>
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+            新增英雄
+          </Button>
+      </div>
       <Table
         columns={columns}
         dataSource={heroes}

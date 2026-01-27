@@ -52,8 +52,8 @@ function adminMiddleware(ctx, next) {
     return;
   }
 
-  // 超级管理员或管理员角色
-  if (user.isSuperAdmin || user.roleCode === 'admin') {
+  // 超级管理员、管理员或内容管理员角色都可以访问管理后台
+  if (user.isSuperAdmin || user.roleCode === 'admin' || user.roleCode === 'content_admin') {
     return next();
   }
 

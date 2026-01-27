@@ -12,7 +12,7 @@ import {
   Switch,
   Tag,
 } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import PageHeader from '@/components/PageHeader'
 import { equipmentApi } from '@/api/equipment'
@@ -25,10 +25,21 @@ const EquipmentManage = () => {
   const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null)
   const [form] = Form.useForm()
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 })
+  const [searchKeyword, setSearchKeyword] = useState('')
 
   useEffect(() => {
     fetchEquipments()
-  }, [pagination.current, pagination.pageSize])
+  }, [pagination.current, pagination.pageSize, searchKeyword])
+
+  const handleSearch = (value: string) => {
+    setSearchKeyword(value)
+    setPagination((prev) => ({ ...prev, current: 1 }))
+  }
+
+  const handleReset = () => {
+    setSearchKeyword('')
+    setPagination((prev) => ({ ...prev, current: 1 }))
+  }
 
   const fetchEquipments = async () => {
     try {
@@ -36,6 +47,7 @@ const EquipmentManage = () => {
       const res = await equipmentApi.getList({
         page: pagination.current,
         pageSize: pagination.pageSize,
+        keyword: searchKeyword || undefined,
       })
       if (res.code === 200 || res.code === 0) {
         setEquipments(res.data?.list || [])
@@ -140,9 +152,10 @@ const EquipmentManage = () => {
       width: 200,
       fixed: 'right',
       render: (_, record) => (
-        <Space>
+        <Space size={0} wrap>
           <Button
             type="link"
+            size="small"
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
           >
@@ -152,7 +165,7 @@ const EquipmentManage = () => {
             title="确定删除？"
             onConfirm={() => handleDelete(record.id)}
           >
-            <Button type="link" danger icon={<DeleteOutlined />}>
+            <Button type="link" size="small" danger icon={<DeleteOutlined />}>
               删除
             </Button>
           </Popconfirm>
@@ -166,13 +179,25 @@ const EquipmentManage = () => {
       <PageHeader
         title="装备管理"
         items={[{ title: '管理后台', path: '/admin' }, { title: '装备管理' }]}
-        extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-            新增装备
-          </Button>
-        }
         blackColor={true}
       />
+      <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
+        <div>
+          <Input.Search
+            placeholder="搜索装备名称"
+            allowClear
+            style={{ width: 300, marginRight: 10 }}
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
+            onSearch={handleSearch}
+            enterButton={<SearchOutlined />}
+          />
+          <Button onClick={handleReset}>重置</Button>
+        </div>
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+            新增装备
+          </Button>
+      </div>
       <Table
         columns={columns}
         dataSource={equipments}
