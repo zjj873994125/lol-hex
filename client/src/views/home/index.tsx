@@ -89,9 +89,9 @@ const Home = () => {
             <Spin size="large" />
           </div>
         ) : hotHeroes.length > 0 ? (
-          <Row gutter={[16, 16]} align="stretch">
+          <Row gutter={[16, 16]} align="stretch" justify="center">
             {hotHeroes.map((hero) => (
-              <Col key={hero.id} xs={6} sm={4} md={3} lg={3} xl={3}>
+              <Col key={hero.id} xs={12} sm={8} md={7} lg={12} xl={6} xxl={3}>
                 <HeroCard hero={hero} />
               </Col>
             ))}

@@ -66,9 +66,9 @@ const EquipmentList = () => {
         </div>
       ) : equipments.length > 0 ? (
         <Card className="equipment-list-content" bordered={false}>
-          <Row gutter={[12, 12]} align="stretch">
+          <Row gutter={[12, 12]} align="stretch" justify="center">
             {equipments.map((equipment) => (
-              <Col key={equipment.id} xs={4} sm={3} md={2} lg={2} xl={2}>
+              <Col key={equipment.id} xs={8} sm={7} md={6} lg={6} xl={4} xxl={2}>
                 <EquipmentCard equipment={equipment} />
               </Col>
             ))}

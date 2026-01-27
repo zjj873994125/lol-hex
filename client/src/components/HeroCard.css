@@ -136,6 +136,7 @@
 /* ==================== 职业标签 ==================== */
 .hero-roles {
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 6px;
 }
