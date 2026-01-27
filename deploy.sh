@@ -2,7 +2,7 @@
 
 # 钉钉机器人配置
 DINGTALK_WEBHOOK="https://oapi.dingtalk.com/robot/send?access_token=e15092dc6020b27c7b85db68598328663a67cdf29c628a26955b61237a874050"
-DINGTALK_SECRET="SECda2414d43883e28d6f3d35e1eaf8cfac221ca3dc971bc55bd167839ee54431a7"
+DINGTALK_SECRET="SEC367d77e0fb592e242539b50e76f9d2dac9f6cfb243af71d941aa78131cfb4dfc"
 
 # 项目配置
 PROJECT_DIR=/root/docker/lol-hex-lite/lol-hex
