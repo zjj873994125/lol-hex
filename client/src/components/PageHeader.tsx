@@ -10,9 +10,10 @@ interface PageHeaderProps {
     path?: string
   }>
   extra?: React.ReactNode
+  blackColor?: boolean
 }
 
-const PageHeader = ({ title, items = [], extra }: PageHeaderProps) => {
+const PageHeader = ({ title, items = [], extra, blackColor = false }: PageHeaderProps) => {
   const breadcrumbItems = [
     {
       title: (
@@ -37,27 +38,27 @@ const PageHeader = ({ title, items = [], extra }: PageHeaderProps) => {
         components: {
           Breadcrumb: {
             /* 这里是你的组件 token */
-            linkColor: '#fff',
-            linkHoverColor: '#ffd700',
+            linkColor: blackColor ? '' : '#fff',
+            linkHoverColor: blackColor ? '' : '#ffd700',
           },
         },
       }}
     >
       <div className="page-header mb-6">
-          <Breadcrumb items={breadcrumbItems} className="mb-4" 
+          <Breadcrumb items={breadcrumbItems} className="mb-4"
           styles={{
             item: {
-              color: '#fff',
+              color: blackColor ? '' : '#fff',
             },
             root: {
-              color: '#fff',
+              color: blackColor ? '' : '#fff',
             },
             separator: {
-              color: '#fff',
+              color: blackColor ? '' : '#fff',
             },
           }} />
           <div className="flex justify-between items-center text-white">
-            <Title level={2} className="m-0 text-white" style={{ color: '#fff' }}>
+            <Title level={2} className="m-0 text-white" style={{ color: blackColor ? '' : '#fff' }}>
               {title}
             </Title>
             {extra}

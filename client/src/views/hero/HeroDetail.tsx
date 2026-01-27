@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Card, Row, Col, Tag, Spin, Empty, Badge, Popover, Divider, Collapse } from 'antd'
+import { Card, Row, Col, Tag, Spin, Empty, Badge, Popover, Divider } from 'antd'
 import { IeOutlined, ThunderboltOutlined, StarFilled, TrophyOutlined, RocketOutlined } from '@ant-design/icons'
 import PageHeader from '@/components/PageHeader'
 import { heroApi } from '@/api/hero'
@@ -8,8 +8,6 @@ import type { Hero, EquipmentBuild, BuildEquipment, HeroHex } from '@/types/hero
 import { HexTierColorMap } from '@/types/hex'
 import { getRoleLabel, getRoleColor } from '@/utils/heroMapping'
 import './HeroDetail.css'
-
-const { Panel } = Collapse
 
 const HeroDetail = () => {
   const { id } = useParams<{ id: string }>()
@@ -189,70 +187,47 @@ const HeroDetail = () => {
             </div>
 
             {equipmentBuilds.length > 0 ? (
-              <div className="build-sections">
-                <Collapse
-                  defaultActiveKey={[0]}
-                  className="equipment-build-collapse"
-                  expandIconPosition="end"
-                  ghost
-                >
-                  {equipmentBuilds.map((build, index) => (
-                    <Panel
-                      key={index}
-                      header={
-                        <div className="build-panel-header">
-                          <div className="build-panel-title">{build.name}</div>
-                          <div className="build-panel-count">{build.equipments?.length || 0} 件装备</div>
-                        </div>
-                      }
-                      className="build-panel"
-                    >
-                      {build.description && (
-                        <div className="build-description">{build.description}</div>
-                      )}
-                      <div className="recommend-grid modern-grid">
-                        {build.equipments?.map((heroEquip) => {
-                          const content = (
-                            <div className="popover-content">
-                              <div className="popover-name">{heroEquip.equipment?.name}</div>
-                              <div className="popover-price">
-                                <TrophyOutlined /> {heroEquip.equipment?.price} 金币
-                              </div>
-                              {heroEquip.description && (
-                                <div className="popover-desc">{heroEquip.description}</div>
-                              )}
-                              <div className="popover-desc">{heroEquip.equipment?.description}</div>
+              <div className="build-list">
+                {equipmentBuilds.map((build, index) => (
+                  <div key={index} className="build-list-item">
+                    <div className="build-list-name">{build.name}</div>
+                    <div className="build-list-equipments">
+                      {build.equipments?.map((heroEquip) => {
+                        const content = (
+                          <div className="popover-content">
+                            <div className="popover-name">{heroEquip.equipment?.name}</div>
+                            <div className="popover-price">
+                              <TrophyOutlined /> {heroEquip.equipment?.price} 金币
                             </div>
-                          )
+                            {heroEquip.description && (
+                              <div className="popover-desc">{heroEquip.description}</div>
+                            )}
+                            <div className="popover-desc">{heroEquip.equipment?.description}</div>
+                          </div>
+                        )
 
-                          return (
-                            <Popover key={heroEquip.id} content={content} trigger="hover" placement="top">
-                              <div className="equipment-card-item">
-                                <div
-                                  className="equipment-priority"
-                                  style={{
-                                    background: getPriorityColor(heroEquip.priority),
-                                  }}
-                                >
-                                  {heroEquip.priority}
-                                </div>
-                                <div className="equipment-icon-wrapper">
-                                  <img
-                                    src={heroEquip.equipment?.icon}
-                                    alt={heroEquip.equipment?.name}
-                                    className="equipment-card-icon"
-                                  />
-                                </div>
-                                <div className="equipment-card-name">{heroEquip.equipment?.name}</div>
-                                <div className="equipment-card-price">{heroEquip.equipment?.price}g</div>
+                        return (
+                          <Popover key={heroEquip.id} content={content} trigger="hover" placement="top">
+                            <div className="build-equip-icon">
+                              <img
+                                src={heroEquip.equipment?.icon}
+                                alt={heroEquip.equipment?.name}
+                              />
+                              <div
+                                className="build-equip-priority"
+                                style={{
+                                  background: getPriorityColor(heroEquip.priority),
+                                }}
+                              >
+                                {heroEquip.priority}
                               </div>
-                            </Popover>
-                          )
-                        })}
-                      </div>
-                    </Panel>
-                  ))}
-                </Collapse>
+                            </div>
+                          </Popover>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <Empty description="暂无出装思路" className="recommend-empty" image={Empty.PRESENTED_IMAGE_SIMPLE} />

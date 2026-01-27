@@ -420,7 +420,7 @@ const HeroManage = () => {
     {
       title: '操作',
       key: 'action',
-      width: 280,
+      width: 340,
       fixed: 'right',
       render: (_, record) => (
         <Space size="small">
@@ -468,6 +468,7 @@ const HeroManage = () => {
             新增英雄
           </Button>
         }
+        blackColor={true}
       />
       <Table
         columns={columns}

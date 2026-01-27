@@ -120,7 +120,7 @@ const Profile = () => {
             <Card
               title={
                 <span className="card-title">
-                  <UserOutlined /> 基本信息
+                  <UserOutlined /> 基本信息ying
                 </span>
               }
               className="profile-form-card"
