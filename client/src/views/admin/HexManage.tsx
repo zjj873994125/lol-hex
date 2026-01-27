@@ -175,6 +175,7 @@ const HexManage = () => {
             新增海克斯
           </Button>
         }
+        blackColor={true}
       />
       <Table
         columns={columns}

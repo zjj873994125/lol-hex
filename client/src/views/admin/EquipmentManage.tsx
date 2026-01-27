@@ -171,6 +171,7 @@ const EquipmentManage = () => {
             新增装备
           </Button>
         }
+        blackColor={true}
       />
       <Table
         columns={columns}

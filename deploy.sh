@@ -11,7 +11,8 @@ IMAGE_NAME=lol-hex
 PORT_WEB=28080
 PORT_API=28899
 PROJECT_NAME="海克斯大乱斗"
-DEPLOYER="${DEPLOYER:-系统}"  # 可通过环境变量传入发布人
+DEPLOYER="${DEPLOYER:-系统}"
+SERVER_IP="101.42.154.80"  # 请修改为实际服务器IP
 
 # 记录开始时间
 START_TIME=$(date +%s)
@@ -20,7 +21,8 @@ START_TIME=$(date +%s)
 generate_sign() {
   local timestamp=$1
   local secret=$2
-  echo -n "${timestamp}"$'\n'"${secret}" | openssl dgst -sha256 -hmac "$secret" -binary | openssl base64
+  # 使用 printf 确保换行符正确
+  printf '%s\n%s' "$timestamp" "$secret" | openssl dgst -sha256 -hmac "$secret" -binary | openssl base64 | tr -d '\n'
 }
 
 # 发送钉钉通知
@@ -30,22 +32,30 @@ send_dingtalk() {
   local content=$3
   local at_all=${4:-false}
 
-  local timestamp=$(date +%s%3N)
+  local timestamp=$(date +%s)000
   local sign=$(generate_sign "$timestamp" "$DINGTALK_SECRET")
-  local url="${DINGTALK_WEBHOOK}&timestamp=${timestamp}&sign=${sign}"
+
+  # URL 编码签名
+  local sign_encoded=$(echo -n "$sign" | jq -sRr @uri)
+
+  local url="${DINGTALK_WEBHOOK}&timestamp=${timestamp}&sign=${sign_encoded}"
 
   case $msg_type in
     text)
       local json="{\"msgtype\":\"text\",\"text\":{\"content\":\"${content}\"}}"
       ;;
     markdown)
-      local json="{\"msgtype\":\"markdown\",\"markdown\":{\"title\":\"${title}\",\"text\":${content}}}"
+      # 转义 Markdown 内容中的特殊字符
+      local content_escaped=$(echo "$content" | sed 's/"/\\"/g')
+      local json="{\"msgtype\":\"markdown\",\"markdown\":{\"title\":\"${title}\",\"text\":\"${content_escaped}\"}}"
       ;;
   esac
 
+  echo "发送钉钉通知..."
   curl -s -X POST "$url" \
     -H "Content-Type: application/json" \
-    -d "$json" > /dev/null 2>&1
+    -d "$json"
+  echo ""
 }
 
 # 发送部署通知
@@ -78,8 +88,8 @@ send_deploy_notify() {
       content+="> **时间**: ${timestamp}\n"
       content+="> **操作人**: ${DEPLOYER}\n"
       content+="> **耗时**: ${duration_text}\n"
-      content+="> **前端地址**: http://your-server-ip:${PORT_WEB}\n"
-      content+="> **后端地址**: http://your-server-ip:${PORT_API}\n"
+      content+="> **前端地址**: http://${SERVER_IP}:${PORT_WEB}\n"
+      content+="> **后端地址**: http://${SERVER_IP}:${PORT_API}\n"
       send_dingtalk "markdown" "${PROJECT_NAME} 发布成功" "$content" "false"
       ;;
     failed)
@@ -96,12 +106,20 @@ send_deploy_notify() {
 
 # 错误处理
 error_exit() {
+  echo "错误: $1"
   send_deploy_notify "failed" "$1"
   exit 1
 }
 
 # 捕获错误
 trap 'error_exit "部署脚本执行失败"' ERR
+
+# 测试钉钉通知
+if [ "$1" = "test" ]; then
+  echo "测试钉钉通知..."
+  send_dingtalk "text" "测试" "📢 钉钉机器人连接测试成功！" "false"
+  exit 0
+fi
 
 # 开始部署
 echo "========================================="
@@ -177,6 +195,6 @@ echo "========================================="
 echo "时间: $(date '+%Y-%m-%d %H:%M:%S')"
 echo ""
 echo "访问地址:"
-echo "  前端: http://your-server-ip:${PORT_WEB}"
-echo "  后端: http://your-server-ip:${PORT_API}"
+echo "  前端: http://${SERVER_IP}:${PORT_WEB}"
+echo "  后端: http://${SERVER_IP}:${PORT_API}"
 echo "========================================="

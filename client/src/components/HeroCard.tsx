@@ -29,8 +29,8 @@ const HeroCard = ({ hero }: HeroCardProps) => {
       </div>
       <div className="hero-info-section">
         <div className="hero-title-row">
-          <span className="hero-title">{hero.title}</span>
           <span className="hero-name">{hero.name}</span>
+          <span className="hero-title">{hero.title}</span>
         </div>
         <div className="hero-roles">
           {hero.tags?.map((tag) => (
