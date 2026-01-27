@@ -7,6 +7,7 @@ const hexRouter = require('./hex');
 const userRouter = require('./user');
 const roleRouter = require('./role');
 const menuRouter = require('./menu');
+const notifyRouter = require('./notify');
 
 function setupRoutes(app) {
   const router = new Router();
@@ -41,6 +42,10 @@ function setupRoutes(app) {
 
   app.use(menuRouter.routes());
   app.use(menuRouter.allowedMethods());
+
+  // 通知路由（钉钉机器人）
+  app.use(notifyRouter.routes());
+  app.use(notifyRouter.allowedMethods());
 
   // 健康检查路由
   app.use(router.routes());
