@@ -1,4 +1,6 @@
+import { useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { gsap } from 'gsap'
 import type { Hero } from '@/types/hero'
 import { getRoleLabel, getRoleColor } from '@/utils/heroMapping'
 import './HeroCard.css'
@@ -9,15 +11,88 @@ interface HeroCardProps {
 
 const HeroCard = ({ hero }: HeroCardProps) => {
   const navigate = useNavigate()
+  const cardRef = useRef<HTMLDivElement>(null)
+  const avatarRef = useRef<HTMLImageElement>(null)
+  const ctxRef = useRef<gsap.Context | null>(null)
+
+  // 组件卸载时清理
+  useEffect(() => {
+    return () => {
+      if (ctxRef.current) {
+        ctxRef.current.revert()
+      }
+    }
+  }, [])
 
   const handleClick = () => {
     navigate(`/heroes/${hero.id}`)
   }
 
+  const handleMouseEnter = () => {
+    if (!cardRef.current || !avatarRef.current) return
+
+    // 清理之前的动画，避免堆积
+    if (ctxRef.current) {
+      ctxRef.current.revert()
+    }
+
+    // 创建新的 context
+    ctxRef.current = gsap.context(() => {
+      // 卡片整体上浮效果
+      gsap.to(cardRef.current, {
+        y: -8,
+        scale: 1.02,
+        duration: 0.35,
+        ease: 'power2.out',
+      })
+
+      // 头像放大效果
+      gsap.to(avatarRef.current, {
+        scale: 1.08,
+        duration: 0.35,
+        ease: 'power2.out',
+      })
+    }, cardRef.current)
+  }
+
+  const handleMouseLeave = () => {
+    if (!cardRef.current || !avatarRef.current) return
+
+    // 清理之前的动画
+    if (ctxRef.current) {
+      ctxRef.current.revert()
+    }
+
+    // 创建新的 context 用于退出动画
+    ctxRef.current = gsap.context(() => {
+      // 恢复卡片位置
+      gsap.to(cardRef.current, {
+        y: 0,
+        scale: 1,
+        duration: 0.3,
+        ease: 'power2.inOut',
+      })
+
+      // 恢复头像大小
+      gsap.to(avatarRef.current, {
+        scale: 1,
+        duration: 0.3,
+        ease: 'power2.inOut',
+      })
+    }, cardRef.current)
+  }
+
   return (
-    <div className="hero-card" onClick={handleClick}>
+    <div
+      className="hero-card"
+      ref={cardRef}
+      onClick={handleClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <div className="hero-avatar-section">
         <img
+          ref={avatarRef}
           src={hero.avatar}
           alt={hero.name}
           className="hero-avatar"

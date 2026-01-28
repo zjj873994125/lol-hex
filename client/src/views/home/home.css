@@ -51,10 +51,14 @@
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  /* GSAP handles transform animations */
   overflow: hidden;
   text-align: center;
   margin: 8px;
+  /* 性能优化 */
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 .quick-menu-item::before {
@@ -65,8 +69,8 @@
   width: 100%;
   height: 3px;
   background: var(--menu-color, #667eea);
-  transform: scaleX(0);
-  transition: transform 0.4s ease;
+  transform: scaleX(var(--border-scale, 0));
+  transition: transform 0.3s ease;
 }
 
 .quick-menu-item::after {
@@ -75,19 +79,16 @@
   inset: 0;
   background: radial-gradient(circle at center, var(--menu-color, #667eea) 0%, transparent 70%);
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.3s ease;
   border-radius: 16px;
+  pointer-events: none;
 }
 
+/* 仅保留 GSAP 未处理的样式变化 */
 .quick-menu-item:hover {
-  transform: translateY(-8px) scale(1.02);
   background: rgba(255, 255, 255, 0.06);
   border-color: var(--menu-color, #667eea);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
-}
-
-.quick-menu-item:hover::before {
-  transform: scaleX(1);
 }
 
 .quick-menu-item:hover::after {
@@ -100,11 +101,10 @@
   font-size: 42px;
   margin-bottom: 12px;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
-  transition: transform 0.4s ease;
-}
-
-.quick-menu-item:hover .menu-icon {
-  transform: scale(1.15) rotate(5deg);
+  /* GSAP handles transform */
+  /* 性能优化 */
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .menu-title {
