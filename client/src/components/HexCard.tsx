@@ -1,5 +1,7 @@
+import { useRef, useEffect } from 'react'
 import { Card, Badge, Popover } from 'antd'
 import { ThunderboltOutlined } from '@ant-design/icons'
+import { gsap } from 'gsap'
 import { HexTierMap, HexTierColorMap } from '@/types/hex'
 import type { Hex } from '@/types/hex'
 import './HexCard.css'
@@ -10,11 +12,54 @@ interface HexCardProps {
 }
 
 const HexCard = ({ hex, onClick }: HexCardProps) => {
+  const cardRef = useRef<HTMLDivElement>(null)
+  const ctxRef = useRef<gsap.Context | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (ctxRef.current) {
+        ctxRef.current.revert()
+      }
+    }
+  }, [])
+
   const handleClick = () => {
     onClick?.()
   }
 
   const tierColor = HexTierColorMap[hex.tier] || '#888'
+
+  const handleMouseEnter = () => {
+    if (!cardRef.current) return
+
+    if (ctxRef.current) {
+      ctxRef.current.revert()
+    }
+
+    ctxRef.current = gsap.context(() => {
+      gsap.to(cardRef.current, {
+        y: -6,
+        duration: 0.3,
+        ease: 'power2.out',
+      })
+    }, cardRef.current)
+  }
+
+  const handleMouseLeave = () => {
+    if (!cardRef.current) return
+
+    if (ctxRef.current) {
+      ctxRef.current.revert()
+    }
+
+    ctxRef.current = gsap.context(() => {
+      gsap.to(cardRef.current, {
+        y: 0,
+        duration: 0.25,
+        ease: 'power2.inOut',
+      })
+    }, cardRef.current)
+  }
 
   const content = (
     <div className="hex-popover-content">
@@ -45,9 +90,12 @@ const HexCard = ({ hex, onClick }: HexCardProps) => {
       overlayClassName="hex-popover"
     >
       <Card
+        ref={cardRef}
         hoverable
         className={onClick ? 'hex-card clickable' : 'hex-card'}
         onClick={handleClick}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         <div className="hex-header">
           <div

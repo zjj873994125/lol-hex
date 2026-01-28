@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Row, Col, Spin, Empty, Pagination, Card } from 'antd'
+import { gsap } from 'gsap'
 import HexCard from '@/components/HexCard'
 import PageHeader from '@/components/PageHeader'
 import SearchBar from '@/components/SearchBar'
@@ -18,6 +19,25 @@ const HexList = () => {
   useEffect(() => {
     fetchHexes()
   }, [page, pageSize])
+
+  // 卡片入场动画
+  useEffect(() => {
+    if (!loading && hexes.length > 0) {
+      gsap.set('.hex-list-card-entrance', {
+        y: 50,
+        opacity: 0,
+      })
+
+      gsap.to('.hex-list-card-entrance', {
+        y: 0,
+        opacity: 1,
+        duration: 0.5,
+        stagger: 0.06,
+        ease: 'power2.out',
+        clearProps: 'all',
+      })
+    }
+  }, [loading, hexes])
 
   const fetchHexes = async (params?: { keyword?: string; tier?: number }) => {
     try {
@@ -81,7 +101,9 @@ const HexList = () => {
           <Row gutter={[16, 16]} align="stretch" justify="center">
             {hexes.map((hex) => (
               <Col key={hex.id} xs={12} sm={8} md={7} lg={12} xl={6} xxl={4}>
-                <HexCard hex={hex} />
+                <div className="hex-list-card-entrance">
+                  <HexCard hex={hex} />
+                </div>
               </Col>
             ))}
           </Row>

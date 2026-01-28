@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Row, Col, Spin, Empty, Pagination, Card } from 'antd'
+import { gsap } from 'gsap'
 import EquipmentCard from '@/components/EquipmentCard'
 import PageHeader from '@/components/PageHeader'
 import SearchBar from '@/components/SearchBar'
@@ -16,8 +17,26 @@ const EquipmentList = () => {
 
   useEffect(() => {
     fetchEquipments()
-    console.log(page, pageSize)
   }, [page, pageSize])
+
+  // 卡片入场动画
+  useEffect(() => {
+    if (!loading && equipments.length > 0) {
+      gsap.set('.equipment-list-card-entrance', {
+        y: 40,
+        opacity: 0,
+      })
+
+      gsap.to('.equipment-list-card-entrance', {
+        y: 0,
+        opacity: 1,
+        duration: 0.45,
+        stagger: 0.04,
+        ease: 'power2.out',
+        clearProps: 'all',
+      })
+    }
+  }, [loading, equipments])
 
   const fetchEquipments = async (params?: { keyword?: string }) => {
     try {
@@ -69,7 +88,9 @@ const EquipmentList = () => {
           <Row gutter={[12, 12]} align="stretch" justify="center">
             {equipments.map((equipment) => (
               <Col key={equipment.id} xs={8} sm={7} md={6} lg={6} xl={4} xxl={2}>
-                <EquipmentCard equipment={equipment} />
+                <div className="equipment-list-card-entrance">
+                  <EquipmentCard equipment={equipment} />
+                </div>
               </Col>
             ))}
           </Row>

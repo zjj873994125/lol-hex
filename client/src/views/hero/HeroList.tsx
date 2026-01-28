@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Row, Col, Spin, Empty, Pagination, Card } from 'antd'
+import { gsap } from 'gsap'
 import HeroCard from '@/components/HeroCard'
 import PageHeader from '@/components/PageHeader'
 import SearchBar from '@/components/SearchBar'
@@ -18,6 +19,25 @@ const HeroList = () => {
   useEffect(() => {
     fetchHeroes()
   }, [page, pageSize])
+
+  // 卡片入场动画
+  useEffect(() => {
+    if (!loading && heroes.length > 0) {
+      gsap.set('.hero-list-card-entrance', {
+        y: 50,
+        opacity: 0,
+      })
+
+      gsap.to('.hero-list-card-entrance', {
+        y: 0,
+        opacity: 1,
+        duration: 0.5,
+        stagger: 0.06,
+        ease: 'power2.out',
+        clearProps: 'all',
+      })
+    }
+  }, [loading, heroes])
 
   const fetchHeroes = async (params?: { keyword?: string; tags?: string[] }) => {
     try {
@@ -76,7 +96,9 @@ const HeroList = () => {
           <Row gutter={[16, 16]} align="stretch" justify="center">
             {heroes.map((hero) => (
               <Col key={hero.id} xs={12} sm={10} md={8} lg={8} xl={6} xxl={3}>
-                <HeroCard hero={hero} />
+                <div className="hero-list-card-entrance">
+                  <HeroCard hero={hero} />
+                </div>
               </Col>
             ))}
           </Row>
