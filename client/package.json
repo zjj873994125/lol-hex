@@ -11,8 +11,9 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
-    "axios": "^1.7.9",
     "antd": "^6.2.1",
+    "axios": "^1.7.9",
+    "gsap": "^3.14.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^6.28.0",
