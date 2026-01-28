@@ -234,13 +234,22 @@
 }
 
 .login-card .ant-input-status-error {
-  background: rgba(255, 107, 107, 0.05);
-  border-color: rgba(255, 107, 107, 0.3);
+  background: rgba(255, 107, 107, 0.05) !important;
+  border-color: rgba(255, 107, 107, 0.3) !important;
 }
 
 .login-card .ant-input-affix-wrapper-status-error {
-  background: rgba(255, 107, 107, 0.05);
-  border-color: rgba(255, 107, 107, 0.3);
+  background: rgba(255, 107, 107, 0.05) !important;
+  border-color: rgba(255, 107, 107, 0.3) !important;
+}
+
+/* 确保内部 input 也保持样式 */
+.login-card .ant-input-affix-wrapper-status-error .ant-input {
+  background: transparent !important;
+}
+
+.login-card .ant-input-status-error .ant-input {
+  background: transparent !important;
 }
 
 /* ==================== 返回首页链接 ==================== */
