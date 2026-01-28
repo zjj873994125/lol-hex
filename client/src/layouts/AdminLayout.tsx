@@ -198,7 +198,7 @@ const AdminLayout = () => {
   }
 
   return (
-    <Layout className="min-h-screen">
+    <Layout className="min-h-screen" style={{ cursor: 'url("@/assets/cursor2.png") 0 0, auto' }}>
       <Sider
         collapsible
         collapsed={collapsed}

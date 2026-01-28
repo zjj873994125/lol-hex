@@ -16,8 +16,8 @@ body {
     'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  cursor: url('@/assets/cursor.png') 0 0, auto;
 }
-
 #root {
   min-height: 100vh;
 }

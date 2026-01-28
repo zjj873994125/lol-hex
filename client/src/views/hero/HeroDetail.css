@@ -10,6 +10,7 @@
   margin-bottom: -60px;
   overflow: hidden;
   border-radius: 0 0 24px 24px;
+  perspective: 1000px;
 }
 
 .hero-banner-bg {
@@ -61,16 +62,9 @@
     0 8px 32px rgba(0, 0, 0, 0.4),
     0 0 0 3px rgba(255, 255, 255, 0.1),
     0 0 20px rgba(255, 255, 255, 0.05);
-  animation: avatarFloat 3s ease-in-out infinite;
-}
-
-@keyframes avatarFloat {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
+  /* GSAP handles 3D transform */
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 
 .hero-banner-avatar img {
@@ -349,12 +343,13 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  /* GSAP handles transform */
+  will-change: transform;
 }
 
 .build-equip-icon:hover {
-  transform: translateY(-2px);
   background: rgba(255, 255, 255, 0.1);
+  cursor: url('@/assets/cursor.png') 0 0, pointer;
 }
 
 .build-equip-icon img {
@@ -449,15 +444,15 @@
   border-radius: 16px;
   padding: 16px 12px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* GSAP handles transform */
   display: flex;
   flex-direction: column;
   align-items: center;
   border: 1px solid rgba(255, 255, 255, 0.08);
+  will-change: transform;
 }
 
 .hex-card-item:hover {
-  transform: translateY(-4px);
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.2);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
@@ -488,11 +483,7 @@
   justify-content: center;
   border: 2px solid;
   margin-bottom: 10px;
-  transition: all 0.3s ease;
-}
-
-.hex-card-item:hover .hex-card-icon-bg {
-  transform: scale(1.1);
+  /* GSAP handles transform on hover */
 }
 
 .hex-card-icon {

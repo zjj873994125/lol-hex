@@ -23,6 +23,7 @@
     0 20px 40px rgba(0, 0, 0, 0.3),
     0 0 0 1px rgba(102, 126, 234, 0.3) inset;
   border-color: rgba(102, 126, 234, 0.5);
+  cursor: url('@/assets/cursor3.png') 0 0, pointer;
 }
 
 /* 光晕装饰 */

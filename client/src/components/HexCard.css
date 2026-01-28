@@ -15,6 +15,9 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+.hex-card:hover {
+  cursor: url('@/assets/cursor3.png') 0 0, pointer;
+}
 .hex-card .ant-card-body {
   height: 100%;
   display: flex;

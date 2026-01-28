@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { Card, Row, Col, Tag, Spin, Empty, Badge, Popover, Divider } from 'antd'
 import { IeOutlined, ThunderboltOutlined, StarFilled, TrophyOutlined, RocketOutlined } from '@ant-design/icons'
+import { gsap } from 'gsap'
 import PageHeader from '@/components/PageHeader'
 import { heroApi } from '@/api/hero'
 import type { Hero, EquipmentBuild, BuildEquipment, HeroHex } from '@/types/hero'
@@ -13,12 +14,107 @@ const HeroDetail = () => {
   const { id } = useParams<{ id: string }>()
   const [hero, setHero] = useState<Hero | null>(null)
   const [loading, setLoading] = useState(true)
+  const [animationsPlayed, setAnimationsPlayed] = useState(false)
+
+  // Refs for GSAP animations
+  const bannerRef = useRef<HTMLDivElement>(null)
+  const bannerBgRef = useRef<HTMLDivElement>(null)
+  const bannerAvatarRef = useRef<HTMLDivElement>(null)
+  const bannerInfoRef = useRef<HTMLDivElement>(null)
+  const statsCardRef = useRef<HTMLDivElement>(null)
+  const equipCardRef = useRef<HTMLDivElement>(null)
+  const hexCardRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (id) {
       fetchHeroDetail(Number(id))
     }
   }, [id])
+
+  // 页面入场动画
+  useEffect(() => {
+    if (!loading && hero && !animationsPlayed) {
+      setAnimationsPlayed(true)
+      playEntranceAnimation()
+    }
+  }, [loading, hero, animationsPlayed])
+
+  const playEntranceAnimation = () => {
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+
+    // 横幅背景缩放效果
+    if (bannerBgRef.current) {
+      gsap.fromTo(bannerBgRef.current,
+        { scale: 1.3 },
+        { scale: 1.1, duration: 1.5, ease: 'power2.out' }
+      )
+    }
+
+    // 横幅内容淡入
+    tl.fromTo(bannerAvatarRef.current,
+      { y: -50, opacity: 0, scale: 0.8 },
+      { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.7)' }
+    )
+    .fromTo(bannerInfoRef.current,
+      { y: 30, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.6 },
+      '-=0.4'
+    )
+    // 标签依次出现
+    .fromTo('.hero-tag-glow',
+      { y: 20, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.4, stagger: 0.08 },
+      '-=0.2'
+    )
+    // 卡片一起进场
+    .fromTo('.detail-card-entrance',
+      { y: 60, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out', clearProps: 'all' },
+      '-=0.2'
+    )
+    // 装备图标交错入场
+    .fromTo('.build-equip-icon',
+      { scale: 0, rotation: -10 },
+      { scale: 1, rotation: 0, duration: 0.4, stagger: 0.05, ease: 'back.out(1.5)' },
+      '-=0.2'
+    )
+    // 海克斯卡片交错入场
+    .fromTo('.hex-card-item',
+      { y: 30, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.5, stagger: 0.06, ease: 'power2.out' },
+      '-=0.2'
+    )
+  }
+
+  // 横幅鼠标移动视差效果
+  const handleBannerMouseMove = (e: React.MouseEvent) => {
+    if (!bannerRef.current || !bannerAvatarRef.current) return
+
+    const rect = bannerRef.current.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width - 0.5
+    const y = (e.clientY - rect.top) / rect.height - 0.5
+
+    gsap.to(bannerAvatarRef.current, {
+      x: x * 20,
+      y: y * 20,
+      rotationY: x * 10,
+      rotationX: -y * 10,
+      duration: 0.5,
+      ease: 'power2.out',
+    })
+  }
+
+  const handleBannerMouseLeave = () => {
+    if (!bannerAvatarRef.current) return
+    gsap.to(bannerAvatarRef.current, {
+      x: 0,
+      y: 0,
+      rotationY: 0,
+      rotationX: 0,
+      duration: 0.5,
+      ease: 'power2.out',
+    })
+  }
 
   const fetchHeroDetail = async (heroId: number) => {
     try {
@@ -95,14 +191,19 @@ const HeroDetail = () => {
   return (
     <div className="hero-detail-page">
       {/* 英雄头部横幅 */}
-      <div className="hero-banner">
-        <div className="hero-banner-bg" style={{ backgroundImage: `url(${hero.avatar})` }} />
+      <div
+        className="hero-banner"
+        ref={bannerRef}
+        onMouseMove={handleBannerMouseMove}
+        onMouseLeave={handleBannerMouseLeave}
+      >
+        <div className="hero-banner-bg" ref={bannerBgRef} style={{ backgroundImage: `url(${hero.avatar})` }} />
         <div className="hero-banner-overlay" />
         <div className="hero-banner-content">
-          <div className="hero-banner-avatar">
+          <div className="hero-banner-avatar" ref={bannerAvatarRef}>
             <img src={hero.avatar} alt={hero.name} />
           </div>
-          <div className="hero-banner-info">
+          <div className="hero-banner-info" ref={bannerInfoRef}>
             <div className="hero-banner-title">{hero.title}</div>
             <h1 className="hero-banner-name">{hero.name}</h1>
             <div className="hero-banner-tags">
@@ -124,7 +225,7 @@ const HeroDetail = () => {
       <Row gutter={[24, 24]} align="stretch">
         {/* 左侧：英雄属性卡片 */}
         <Col xs={24} lg={8}>
-          <Card className="hero-stats-card" bordered={false}>
+          <Card className="hero-stats-card detail-card-entrance" bordered={false} ref={statsCardRef}>
             <div className="hero-card-image-wrapper">
               <img src={hero.avatar} alt={hero.name} className="hero-card-image" />
             </div>
@@ -172,7 +273,7 @@ const HeroDetail = () => {
         {/* 右侧：推荐内容卡片 */}
         <Col xs={24} lg={16}>
           {/* 推荐装备 - 按出装思路分组 */}
-          <Card className="recommend-card equipment-card" bordered={false}>
+          <Card className="recommend-card equipment-card detail-card-entrance" bordered={false} ref={equipCardRef}>
             <div className="recommend-card-header">
               <div className="recommend-header-icon equipment-icon">
                 <IeOutlined />
@@ -235,7 +336,7 @@ const HeroDetail = () => {
           </Card>
 
           {/* 推荐海克斯 */}
-          <Card className="recommend-card hex-card" bordered={false}>
+          <Card className="recommend-card hex-card detail-card-entrance" bordered={false} ref={hexCardRef}>
             <div className="recommend-card-header">
               <div className="recommend-header-icon hex-icon-header">
                 <ThunderboltOutlined />
