@@ -7,6 +7,7 @@
   min-height: 100vh;
   background: #0a0e27;
   overflow: hidden;
+  perspective: 1500px;
 }
 
 /* 背景动画效果 */
@@ -72,20 +73,13 @@
   box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(255, 255, 255, 0.05) inset;
-  animation: cardFloat 6s ease-in-out infinite;
-}
-
-@keyframes cardFloat {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+  /* GSAP handles 3D transform */
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 
 /* 标题部分 */
-.login-card .text-center h2 {
+.login-title {
   font-size: 32px;
   font-weight: 800;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
@@ -94,6 +88,17 @@
   background-clip: text;
   margin-bottom: 8px;
   letter-spacing: -0.5px;
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 .login-card .mb-4 {
@@ -186,6 +191,8 @@
   border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
+  position: relative;
+  overflow: hidden;
   transition: all 0.3s ease;
 }
 
@@ -195,6 +202,21 @@
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
+.login-card .ant-btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+  transition: left 0.5s ease;
+}
+
+.login-card .ant-btn-primary:hover:not(:disabled)::before {
+  left: 100%;
+}
+
 .login-card .ant-btn-primary:hover:not(:disabled) {
   background: linear-gradient(135deg, #5568d3 0%, #653a8f 100%);
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
@@ -202,7 +224,7 @@
 }
 
 .login-card .ant-btn-primary:active:not(:disabled) {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.98);
 }
 
 /* ==================== 错误提示样式 ==================== */
