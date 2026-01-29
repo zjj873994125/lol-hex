@@ -206,6 +206,9 @@ const HeroDetail = () => {
           <div className="hero-banner-info" ref={bannerInfoRef}>
             <div className="hero-banner-title">{hero.title}</div>
             <h1 className="hero-banner-name">{hero.name}</h1>
+            {hero.description && (
+              <div className="hero-banner-description">“{hero.description}”</div>
+            )}
             <div className="hero-banner-tags">
               {hero.tags.map((tag) => (
                 <Tag key={tag} color={getRoleColor(tag)} className="hero-tag-glow">

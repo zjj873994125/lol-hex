@@ -97,6 +97,14 @@
   letter-spacing: -1px;
 }
 
+.hero-banner-description {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 8px;
+  max-width: 500px;
+  line-height: 1.5;
+}
+
 .hero-banner-tags {
   display: flex;
   gap: 10px;

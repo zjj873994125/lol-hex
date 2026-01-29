@@ -149,6 +149,9 @@ const MobileHeroDetail = () => {
       <div className="hero-info-section">
         <div className="hero-title">{hero.title}</div>
         <h1 className="hero-name">{hero.name}</h1>
+        {hero.description && (
+          <div className="hero-description">“{hero.description}”</div>
+        )}
 
         {/* 属性标签 */}
         <div className="hero-tags-section">
