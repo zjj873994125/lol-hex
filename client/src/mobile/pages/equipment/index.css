@@ -1,0 +1,13 @@
+.mobile-equipment-list {
+  padding: 0;
+}
+
+/* 装备页面网格需要去掉默认padding，让卡片贴边 */
+.mobile-equipment-list .mobile-grid-4 {
+  padding: 0 1.6rem;
+}
+
+.mobile-equipment-list .mobile-search-bar {
+  margin-top: 4.8rem; /* 为固定头部留出空间 */
+  margin-bottom: 1.6rem;
+}

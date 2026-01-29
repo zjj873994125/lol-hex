@@ -1,0 +1,109 @@
+.mobile-home {
+  padding: 0;
+}
+
+/* ==================== 横幅 ==================== */
+.mobile-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 3.2rem 2rem;
+  border-radius: 0 0 2rem 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.mobile-banner-title {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.8rem 0;
+  letter-spacing: -0.05rem;
+}
+
+.mobile-banner-subtitle {
+  font-size: 1.4rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+/* ==================== 快捷入口 ==================== */
+.mobile-quick-menus {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  padding: 0 1.6rem 2rem;
+}
+
+.mobile-quick-menu {
+  position: relative;
+  background: rgba(26, 26, 46, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.6rem;
+  padding: 2rem 1.2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.mobile-quick-menu::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0.3rem;
+  background: var(--menu-color, #667eea);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.mobile-quick-menu:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-quick-menu:active::before {
+  transform: scaleX(1);
+}
+
+.quick-menu-icon {
+  font-size: 3.6rem;
+  margin-bottom: 0.8rem;
+}
+
+.quick-menu-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* ==================== 区块标题 ==================== */
+.mobile-section {
+  padding: 0 1.6rem 2.4rem;
+}
+
+.mobile-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.6rem;
+}
+
+.mobile-section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.mobile-section-more {
+  font-size: 1.4rem;
+  color: #667eea;
+  cursor: pointer;
+}
+
+/* ==================== 触摸反馈 ==================== */
+.mobile-hero-card:active,
+.mobile-quick-menu:active {
+  -webkit-tap-highlight-color: transparent;
+}

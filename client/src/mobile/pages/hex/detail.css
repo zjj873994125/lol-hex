@@ -1,0 +1,200 @@
+.hex-detail-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0a1a1f 0%, #1a2a30 50%, #0d1418 100%);
+  padding-bottom: 3rem;
+}
+
+/* ==================== 顶部背景 ==================== */
+.hex-detail-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40rem;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.hex-bg-glow {
+  position: absolute;
+  top: -10rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50rem;
+  height: 50rem;
+  filter: blur(6rem);
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateX(-50%) scale(1.1);
+  }
+}
+
+/* ==================== 海克斯图标区域 ==================== */
+.hex-icon-section {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding-top: 6rem;
+  padding-bottom: 2rem;
+  z-index: 1;
+}
+
+.hex-icon-container {
+  position: relative;
+  width: 18rem;
+  height: 18rem;
+}
+
+.hex-icon-bg-large {
+  position: relative;
+  width: 18rem;
+  height: 18rem;
+  background: radial-gradient(circle at 30% 30%, #1a2332 0%, #091428 100%);
+  border: 0.5rem solid;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 0 4px 12px rgba(0, 0, 0, 0.6),
+    0 0 0 0.4rem var(--hex-color, #0ac8b9),
+    0 1rem 4rem var(--hex-color, rgba(10, 200, 185, 0.4));
+}
+
+.hex-icon-bg-large::before {
+  content: '';
+  position: absolute;
+  inset: -0.4rem;
+  border-radius: 50%;
+  background: var(--hex-color, #0ac8b9);
+  opacity: 0.3;
+  filter: blur(1rem);
+  z-index: -1;
+}
+
+.hex-icon-img {
+  width: 10rem;
+  height: 10rem;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+}
+
+.hex-icon-pulse {
+  position: absolute;
+  inset: -1rem;
+  border-radius: 50%;
+  border: 0.15rem solid;
+  opacity: 0.4;
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+}
+
+.hex-icon-container::after {
+  content: '';
+  position: absolute;
+  bottom: -3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 6rem;
+  background: linear-gradient(to top, rgba(13, 20, 24, 1) 0%, transparent 100%);
+  filter: blur(1rem);
+}
+
+/* ==================== 海克斯信息 ==================== */
+.hex-info-section {
+  position: relative;
+  text-align: center;
+  padding: 0 2rem;
+  z-index: 1;
+}
+
+.hex-tier-badge {
+  margin-bottom: 1rem;
+}
+
+.hex-tier-badge .ant-badge {
+  font-size: 1.3rem;
+  padding: 0.5rem 1.6rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 2.5rem;
+}
+
+.hex-name {
+  font-size: 2.6rem;
+  font-weight: 900;
+  color: #fff;
+  margin: 0;
+  text-shadow: 0 0 2rem var(--hex-color, rgba(10, 200, 185, 0.6));
+}
+
+/* ==================== 内容区域 ==================== */
+.hex-content-section {
+  position: relative;
+  padding: 2rem 1.5rem;
+  z-index: 1;
+}
+
+.content-block {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.content-block::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0.3rem;
+  background: linear-gradient(90deg, transparent, var(--hex-color, #0ac8b9), transparent);
+  opacity: 0.5;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.section-title .anticon {
+  font-size: 1.5rem;
+  color: var(--hex-color, #0ac8b9);
+}
+
+.description-content {
+  font-size: 1.4rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.8;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1.2rem;
+  border-radius: 1rem;
+}

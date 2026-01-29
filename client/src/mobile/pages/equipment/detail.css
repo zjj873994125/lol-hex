@@ -1,0 +1,180 @@
+.equip-detail-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0f1a1f 0%, #1a2030 50%, #0d1418 100%);
+  padding-bottom: 3rem;
+}
+
+/* ==================== 顶部背景 ==================== */
+.equip-detail-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40rem;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.equip-bg-glow {
+  position: absolute;
+  top: -10rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50rem;
+  height: 50rem;
+  background: radial-gradient(circle, rgba(255, 169, 64, 0.25) 0%, rgba(255, 140, 0, 0.12) 40%, transparent 70%);
+  filter: blur(6rem);
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateX(-50%) scale(1.1);
+  }
+}
+
+/* ==================== 装备图标区域 ==================== */
+.equip-icon-section {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding-top: 6rem;
+  padding-bottom: 2rem;
+  z-index: 1;
+}
+
+.equip-icon-container {
+  position: relative;
+  width: 20rem;
+  height: 20rem;
+}
+
+.equip-icon-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 24px rgba(255, 169, 64, 0.3));
+}
+
+.equip-icon-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 2rem;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.equip-icon-container::after {
+  content: '';
+  position: absolute;
+  bottom: -3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 6rem;
+  background: linear-gradient(to top, rgba(13, 20, 24, 1) 0%, transparent 100%);
+  filter: blur(1rem);
+}
+
+/* ==================== 装备信息 ==================== */
+.equip-info-section {
+  position: relative;
+  text-align: center;
+  padding: 0 2rem;
+  z-index: 1;
+}
+
+.equip-name {
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: #fff;
+  margin: 0 0 1rem 0;
+  text-shadow:
+    0 0 20px rgba(255, 169, 64, 0.5),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(135deg, #ffd89b 0%, #ffa940 50%, #ff8c00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.equip-price {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ffa940;
+  background: linear-gradient(135deg, rgba(255, 169, 64, 0.15) 0%, rgba(255, 140, 0, 0.1) 100%);
+  padding: 0.7rem 2rem;
+  border-radius: 2.5rem;
+  border: 1px solid rgba(255, 169, 64, 0.3);
+  margin-bottom: 1.5rem;
+}
+
+.equip-price .anticon {
+  font-size: 1.4rem;
+}
+
+.equip-keywords {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.equip-keyword-tag {
+  font-size: 1.3rem;
+  font-weight: 600;
+  padding: 0.5rem 1.2rem;
+  border-radius: 2rem;
+  background: rgba(255, 169, 64, 0.12);
+  border: 1px solid rgba(255, 169, 64, 0.25);
+  color: #ffa940 !important;
+  backdrop-filter: blur(10px);
+}
+
+/* ==================== 内容区域 ==================== */
+.equip-content-section {
+  position: relative;
+  padding: 2rem 1.5rem;
+  z-index: 1;
+}
+
+.content-block {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.section-title .anticon {
+  font-size: 1.5rem;
+  color: #ffa940;
+}
+
+.description-content {
+  font-size: 1.4rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.8;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1.2rem;
+  border-radius: 1rem;
+}

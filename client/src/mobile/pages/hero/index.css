@@ -1,0 +1,12 @@
+.mobile-hero-list {
+  padding: 0;
+}
+
+.mobile-hero-list .mobile-grid-2 {
+  padding: 0 1.6rem;
+}
+
+.mobile-hero-list .mobile-search-bar {
+  margin-top: 4.8rem; /* 为固定头部留出空间 */
+  margin-bottom: 1.6rem;
+}

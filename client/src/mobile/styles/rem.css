@@ -1,0 +1,29 @@
+/* ==================== 移动端 rem 适配 ==================== */
+/*
+  设计稿宽度：375px (iPhone SE/12 mini/13 mini 基准)
+  1rem = 10px (计算方便)
+  根字体大小 = (屏幕宽度 / 375) * 10
+*/
+
+@media (max-width: 767px) {
+  html {
+    font-size: calc(100vw / 37.5);
+    min-font-size: 10px;
+    max-font-size: 14px;
+  }
+
+  /* 限制最大字体大小，避免在大屏上过大 */
+  @media (min-width: 500px) {
+    html {
+      font-size: calc(500px / 37.5);
+    }
+  }
+}
+
+/* ==================== 基础重置 ==================== */
+@media (max-width: 767px) {
+  .mobile-layout,
+  .mobile-page {
+    font-size: 0.14rem;
+  }
+}

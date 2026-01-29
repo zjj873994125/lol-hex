@@ -1,0 +1,17 @@
+.mobile-layout {
+  min-height: 100vh;
+  background: #0a0e27;
+}
+
+.mobile-content {
+  min-height: 100vh;
+  padding-bottom: 5.6rem; /* 底部 TabBar 高度 */
+}
+
+.mobile-layout:has(.no-header) .mobile-content {
+  padding-top: 0;
+}
+
+.mobile-layout:has(.hide-tab-bar) .mobile-content {
+  padding-bottom: 0;
+}
