@@ -223,7 +223,7 @@
 
 .priority-badge {
   position: absolute;
-  top: -0.3rem;
+  top: 0rem;
   right: -0.3rem;
   width: 1.3rem;
   height: 1.3rem;
@@ -289,6 +289,15 @@
   flex-shrink: 0;
   width: 4.5rem;
   height: 4.5rem;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hex-icon-wrap * {
+  pointer-events: none;
 }
 
 .hex-icon-bg {

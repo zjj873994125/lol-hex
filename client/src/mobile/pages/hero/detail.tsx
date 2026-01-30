@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { gsap } from 'gsap'
-import { Spin, Empty, Tag } from 'antd'
+import { Spin, Empty, Tag, Tooltip } from 'antd'
 import { StarFilled, ThunderboltOutlined, AppstoreOutlined } from '@ant-design/icons'
 import MobileHeader from '@/mobile/components/MobileHeader'
 import { heroApi } from '@/api/hero'
@@ -14,8 +14,11 @@ const MobileHeroDetail = () => {
   const { id } = useParams<{ id: string }>()
   const [hero, setHero] = useState<Hero | null>(null)
   const [loading, setLoading] = useState(true)
+  const [activeHexTooltip, setActiveHexTooltip] = useState<number | null>(null)
 
   const pageRef = useRef<HTMLDivElement>(null)
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const LONG_PRESS_DURATION = 500
 
   useEffect(() => {
     if (id) {
@@ -89,6 +92,21 @@ const MobileHeroDetail = () => {
     if (tier === 2) return { background: 'linear-gradient(135deg, #a8a8a8 0%, #e0e0e0 100%)' }
     if (tier === 3) return { background: 'linear-gradient(135deg, #f7971e 0%, #ffd200 100%)' }
     return {}
+  }
+
+  const handleHexTouchStart = (hexId: number) => {
+    longPressTimer.current = setTimeout(() => {
+      console.log('handleHexTouchStart', hexId)
+      setActiveHexTooltip(hexId)
+    }, LONG_PRESS_DURATION)
+  }
+
+  const handleHexTouchEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current)
+      longPressTimer.current = null
+    }
+    setActiveHexTooltip(null)
   }
 
   if (loading) {
@@ -218,24 +236,37 @@ const MobileHeroDetail = () => {
                     </div>
                     <div className="hex-items">
                       {tierHexes.map((heroHex: HeroHex) => (
-                        <div key={heroHex.id} className="hex-icon-wrap">
+                        <Tooltip
+                          key={heroHex.id}
+                          title={heroHex.hex?.name}
+                          open={activeHexTooltip === heroHex.id}
+                          placement="top"
+                        >
                           <div
-                            className="hex-icon-bg"
-                            style={{ borderColor: HexTierColorMap[heroHex.hex?.tier || 1] }}
+                            className="hex-icon-wrap"
+                            onTouchStart={() => handleHexTouchStart(heroHex.id)}
+                            onTouchEnd={handleHexTouchEnd}
+                            onTouchCancel={handleHexTouchEnd}
+                            onContextMenu={(e) => e.preventDefault()}
                           >
-                            <img
-                              src={heroHex.hex?.icon}
-                              alt={heroHex.hex?.name}
-                              className="hex-icon"
-                            />
+                            <div
+                              className="hex-icon-bg"
+                              style={{ borderColor: HexTierColorMap[heroHex.hex?.tier || 1] }}
+                            >
+                              <img
+                                src={heroHex.hex?.icon}
+                                alt={heroHex.hex?.name}
+                                className="hex-icon"
+                              />
+                            </div>
+                            <span
+                              className="priority-badge"
+                              style={{ background: getPriorityColor(heroHex.priority) }}
+                            >
+                              {heroHex.priority}
+                            </span>
                           </div>
-                          <span
-                            className="priority-badge"
-                            style={{ background: getPriorityColor(heroHex.priority) }}
-                          >
-                            {heroHex.priority}
-                          </span>
-                        </div>
+                        </Tooltip>
                       ))}
                     </div>
                   </div>
