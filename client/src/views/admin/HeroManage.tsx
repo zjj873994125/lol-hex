@@ -27,6 +27,8 @@ import {
   ThunderboltOutlined,
   RocketOutlined,
   MinusCircleOutlined,
+  HolderOutlined,
+  InfoCircleOutlined,
 } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import PageHeader from '@/components/PageHeader'
@@ -61,7 +63,14 @@ interface EquipmentBuildForm {
   name: string
   description?: string
   priority?: number
-  equipments?: BuildEquipment[]
+  equipments?: BuildEquipmentForm[]
+}
+
+interface BuildEquipmentForm {
+  id?: number
+  equipmentId: number
+  priority: number
+  description?: string
 }
 
 const HeroManage = () => {
@@ -73,7 +82,6 @@ const HeroManage = () => {
   const [editingHero, setEditingHero] = useState<Hero | null>(null)
   const [currentHero, setCurrentHero] = useState<Hero | null>(null)
   const [form] = Form.useForm()
-  const [buildsForm] = Form.useForm()
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 })
   const [searchKeyword, setSearchKeyword] = useState('')
 
@@ -82,10 +90,18 @@ const HeroManage = () => {
   const [hexes, setHexes] = useState<Hex[]>([])
   // 出装思路列表
   const [equipmentBuilds, setEquipmentBuilds] = useState<EquipmentBuildForm[]>([])
+  // 原始出装思路数据（用于 diff 比较）
+  const [originalBuilds, setOriginalBuilds] = useState<EquipmentBuild[]>([])
   // 选中的海克斯列表
   const [selectedHexes, setSelectedHexes] = useState<RecommendationItem[]>([])
   // 当前编辑的出装思路索引
   const [editingBuildIndex, setEditingBuildIndex] = useState<number | null>(null)
+  // 拖拽状态
+  const [draggingBuildIndex, setDraggingBuildIndex] = useState<number | null>(null)
+  const [dragOverBuildIndex, setDragOverBuildIndex] = useState<number | null>(null)
+  const [draggingBuildEquipIndex, setDraggingBuildEquipIndex] = useState<number | null>(null)
+  const [dragOverBuildEquipIndex, setDragOverBuildEquipIndex] = useState<number | null>(null)
+  const [activeBuildIndex, setActiveBuildIndex] = useState<number | null>(null)
 
   useEffect(() => {
     fetchHeroes()
@@ -203,79 +219,130 @@ const HeroManage = () => {
     try {
       const res = await heroApi.getBuilds(hero.id)
       if (res.code === 200 || res.code === 0 && res.data) {
-        const builds = res.data.map((build: any) => ({
+        // 保存原始数据用于 diff 比较
+        setOriginalBuilds(res.data)
+
+        // 按 priority 降序排序
+        const sortedBuilds = [...res.data].sort((a, b) => (b.priority || 0) - (a.priority || 0))
+
+        const builds = sortedBuilds.map((build: any) => ({
           id: build.id,
           name: build.name,
           description: build.description || '',
-          priority: build.priority,
+          priority: build.priority || 0,
           // 后端返回的是 BuildEquipments（Sequelize 关联名）
-          equipments: (build.BuildEquipments || []).map((e: any) => ({
-            id: e.id,
-            equipmentId: e.equipmentId,
-            priority: e.priority,
-            description: e.description,
-          })),
+          equipments: (build.BuildEquipments || [])
+            .sort((a: any, b: any) => a.priority - b.priority)
+            .map((e: any) => ({
+              id: e.id,
+              equipmentId: e.equipmentId,
+              priority: e.priority,
+              description: e.description,
+            })),
         }))
         setEquipmentBuilds(builds)
-        // 设置表单初始值
-        buildsForm.setFieldsValue({ builds })
       }
     } catch (error) {
       console.error('Failed to fetch builds:', error)
       setEquipmentBuilds([])
-      buildsForm.setFieldsValue({ builds: [] })
+      setOriginalBuilds([])
     }
     setBuildModalVisible(true)
   }
 
-  // 保存出装思路
+  // 保存出装思路（优化版：使用 diff 算法，只调用必要的 API）
   const handleSaveBuilds = async () => {
     if (!currentHero) return
 
     try {
-      const values = await buildsForm.validateFields()
-      const { builds } = values
-
-      if (!Array.isArray(builds)) {
-        message.error('出装思路数据格式错误')
-        return
+      // 验证数据
+      for (const build of equipmentBuilds) {
+        if (!build.name || build.name.trim() === '') {
+          message.error('请填写所有出装思路的名称')
+          return
+        }
       }
 
-      // 获取现有的出装思路
-      const existingRes = await heroApi.getBuilds(currentHero.id)
-      const existingBuilds = existingRes.code === 200 ? existingRes.data : []
+      const heroId = currentHero.id
+      const originalIds = new Set(originalBuilds.map(b => b.id))
+      const newIds = new Set(equipmentBuilds.filter(b => b.id).map(b => b.id!))
 
-      // 删除所有现有的出装思路
-      for (const existingBuild of existingBuilds) {
-        await heroApi.deleteBuild(currentHero.id, existingBuild.id)
+      // 1. 找出需要删除的出装思路
+      const toDelete = [...originalIds].filter(id => !newIds.has(id))
+
+      // 2. 找出需要更新的和新增的出装思路
+      const toUpdate: EquipmentBuildForm[] = []
+      const toCreate: EquipmentBuildForm[] = []
+
+      equipmentBuilds.forEach((build, index) => {
+        const priority = equipmentBuilds.length - index // 降序优先级
+        if (build.id) {
+          // 已存在的，判断是否需要更新
+          const original = originalBuilds.find(b => b.id === build.id)
+          if (original &&
+              (original.name !== build.name ||
+               original.description !== build.description ||
+               original.priority !== priority)) {
+            toUpdate.push({ ...build, priority })
+          } else {
+            // priority 也需要更新（因为拖拽排序改变了顺序）
+            toUpdate.push({ ...build, priority })
+          }
+        } else {
+          // 新增的
+          toCreate.push({ ...build, priority })
+        }
+      })
+
+      // 3. 执行删除操作
+      for (const id of toDelete) {
+        await heroApi.deleteBuild(heroId, id)
       }
 
-      // 创建新的出装思路
-      for (const build of builds) {
-        if (!build.name || build.name.trim() === '') continue
-
-        // 创建出装思路
-        const createRes = await heroApi.createBuild(currentHero.id, {
+      // 4. 执行更新操作（包括更新出装思路本身和其装备）
+      for (const build of toUpdate) {
+        await heroApi.updateBuild(heroId, build.id!, {
           name: build.name,
-          description: build.description || '',
-          priority: build.priority || 0,
+          description: build.description,
+          priority: build.priority,
+        })
+
+        // 更新装备
+        if (build.equipments) {
+          const equipments = build.equipments
+            .filter(e => e.equipmentId)
+            .map((e, idx) => ({
+              equipmentId: e.equipmentId,
+              priority: idx + 1,
+              description: e.description || '',
+            }))
+          await heroApi.updateBuildEquipments(heroId, build.id!, equipments)
+        }
+      }
+
+      // 5. 执行创建操作
+      for (const build of toCreate) {
+        const createRes = await heroApi.createBuild(heroId, {
+          name: build.name,
+          description: build.description,
+          priority: build.priority,
         })
 
         if (createRes.code === 200 && createRes.data) {
           const buildId = createRes.data.id
 
           // 添加装备
-          if (build.equipments && Array.isArray(build.equipments)) {
+          if (build.equipments) {
             const equipments = build.equipments
-              .filter((e: any) => e.equipmentId)
-              .map((e: any) => ({
+              .filter(e => e.equipmentId)
+              .map((e, idx) => ({
                 equipmentId: e.equipmentId,
-                priority: e.priority || 0,
+                priority: idx + 1,
                 description: e.description || '',
               }))
 
             if (equipments.length > 0) {
-              await heroApi.updateBuildEquipments(currentHero.id, buildId, equipments)
+              await heroApi.updateBuildEquipments(heroId, buildId, equipments)
             }
           }
         }
@@ -294,18 +361,117 @@ const HeroManage = () => {
     const newBuilds = [...equipmentBuilds, {
       name: `出装思路 ${equipmentBuilds.length + 1}`,
       description: '',
-      priority: 0,
+      priority: equipmentBuilds.length,
       equipments: [],
     }]
     setEquipmentBuilds(newBuilds)
-    buildsForm.setFieldsValue({ builds: newBuilds })
   }
 
   // 删除出装思路
   const removeBuild = (index: number) => {
     const newBuilds = equipmentBuilds.filter((_, i) => i !== index)
     setEquipmentBuilds(newBuilds)
-    buildsForm.setFieldsValue({ builds: newBuilds })
+  }
+
+  // ==================== 出装思路拖拽排序 ====================
+  const handleBuildDragStart = (index: number) => {
+    setDraggingBuildIndex(index)
+  }
+
+  const handleBuildDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault()
+    if (draggingBuildIndex === null || draggingBuildIndex === index) return
+    setDragOverBuildIndex(index)
+  }
+
+  const handleBuildDragEnd = () => {
+    if (draggingBuildIndex !== null && dragOverBuildIndex !== null && draggingBuildIndex !== dragOverBuildIndex) {
+      const newBuilds = [...equipmentBuilds]
+      const [removed] = newBuilds.splice(draggingBuildIndex, 1)
+      newBuilds.splice(dragOverBuildIndex, 0, removed)
+      setEquipmentBuilds(newBuilds)
+    }
+    setDraggingBuildIndex(null)
+    setDragOverBuildIndex(null)
+  }
+
+  // ==================== 装备拖拽排序 ====================
+  const handleEquipmentDragStart = (buildIndex: number, equipIndex: number) => {
+    setActiveBuildIndex(buildIndex)
+    setDraggingBuildEquipIndex(equipIndex)
+  }
+
+  const handleEquipmentDragOver = (e: React.DragEvent, buildIndex: number, equipIndex: number) => {
+    e.preventDefault()
+    if (activeBuildIndex === buildIndex && draggingBuildEquipIndex !== equipIndex) {
+      setDragOverBuildEquipIndex(equipIndex)
+    }
+  }
+
+  const handleEquipmentDragEnd = () => {
+    if (activeBuildIndex !== null && draggingBuildEquipIndex !== null && dragOverBuildEquipIndex !== null) {
+      if (draggingBuildEquipIndex !== dragOverBuildEquipIndex) {
+        const newBuilds = [...equipmentBuilds]
+        const build = { ...newBuilds[activeBuildIndex] }
+        const equipments = [...(build.equipments || [])]
+        const [removed] = equipments.splice(draggingBuildEquipIndex, 1)
+        equipments.splice(dragOverBuildEquipIndex, 0, removed)
+        build.equipments = equipments.map((e, idx) => ({ ...e, priority: idx + 1 }))
+        newBuilds[activeBuildIndex] = build
+        setEquipmentBuilds(newBuilds)
+      }
+    }
+    setDraggingBuildEquipIndex(null)
+    setDragOverBuildEquipIndex(null)
+  }
+
+  // 添加装备到指定出装思路
+  const addEquipment = (buildIndex: number, equipmentId: number) => {
+    if (!equipmentId) return
+    const newBuilds = [...equipmentBuilds]
+    const build = { ...newBuilds[buildIndex] }
+    const equipments = [...(build.equipments || [])]
+
+    // 检查是否已添加
+    if (equipments.some(e => e.equipmentId === equipmentId)) {
+      message.warning('该装备已添加')
+      return
+    }
+
+    equipments.push({
+      equipmentId,
+      priority: equipments.length + 1,
+      description: '',
+    })
+    build.equipments = equipments
+    newBuilds[buildIndex] = build
+    setEquipmentBuilds(newBuilds)
+  }
+
+  // 移除装备
+  const removeEquipment = (buildIndex: number, equipIndex: number) => {
+    const newBuilds = [...equipmentBuilds]
+    const build = { ...newBuilds[buildIndex] }
+    const equipments = [...(build.equipments || [])]
+    equipments.splice(equipIndex, 1)
+    // 重新计算优先级
+    build.equipments = equipments.map((e, idx) => ({ ...e, priority: idx + 1 }))
+    newBuilds[buildIndex] = build
+    setEquipmentBuilds(newBuilds)
+  }
+
+  // 更新出装思路名称
+  const updateBuildName = (index: number, name: string) => {
+    const newBuilds = [...equipmentBuilds]
+    newBuilds[index] = { ...newBuilds[index], name }
+    setEquipmentBuilds(newBuilds)
+  }
+
+  // 更新出装思路描述
+  const updateBuildDescription = (index: number, description: string) => {
+    const newBuilds = [...equipmentBuilds]
+    newBuilds[index] = { ...newBuilds[index], description }
+    setEquipmentBuilds(newBuilds)
   }
 
   // 打开推荐海克斯弹窗
@@ -583,149 +749,159 @@ const HeroManage = () => {
 
       {/* 出装思路弹窗 */}
       <Modal
-        title={`出装思路管理 - ${currentHero?.name}`}
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <RocketOutlined />
+            <span>出装思路管理 - {currentHero?.name}</span>
+          </div>
+        }
         open={buildModalVisible}
         onOk={handleSaveBuilds}
         onCancel={() => setBuildModalVisible(false)}
         width={900}
         forceRender
       >
-        <Form
-          form={buildsForm}
-          layout="vertical"
-        >
-          <Form.List name="builds">
-            {(fields, { add, remove }) => (
-              <>
-                {fields.map(({ key, name, ...restField }, index) => (
-                  <Card
-                    key={key}
-                    size="small"
-                    style={{ marginBottom: 16 }}
-                    className="build-card"
-                    extra={
+        <div style={{ marginBottom: 16, color: '#666', fontSize: 13 }}>
+          <InfoCircleOutlined style={{ marginRight: 4 }} />
+          拖拽出装思路可调整优先级，拖拽装备卡片可调整出装顺序
+        </div>
+
+        <div className="draggable-build-container">
+          {equipmentBuilds.map((build, buildIndex) => (
+            <Card
+              key={build.id || `new-${buildIndex}`}
+              className={`draggable-build-card ${draggingBuildIndex === buildIndex ? 'dragging' : ''} ${dragOverBuildIndex === buildIndex ? 'drag-over' : ''}`}
+              size="small"
+            >
+              {/* 可拖拽的出装思路头部 */}
+              <div
+                className="build-drag-handle"
+                draggable
+                onDragStart={() => handleBuildDragStart(buildIndex)}
+                onDragOver={(e) => handleBuildDragOver(e, buildIndex)}
+                onDragEnd={handleBuildDragEnd}
+              >
+                <HolderOutlined className="build-drag-handle-icon" />
+                <div className="build-header-content">
+                  <span className="build-priority-badge">{buildIndex + 1}</span>
+                  <Input
+                    className="build-name-input"
+                    value={build.name}
+                    onChange={(e) => updateBuildName(buildIndex, e.target.value)}
+                    placeholder="出装思路名称"
+                    bordered={false}
+                    style={{ padding: 0 }}
+                  />
+                  <Input
+                    value={build.description || ''}
+                    onChange={(e) => updateBuildDescription(buildIndex, e.target.value)}
+                    placeholder="添加描述..."
+                    bordered={false}
+                    style={{ width: 200, padding: 0, fontSize: 12 }}
+                  />
+                </div>
+                <Button
+                  type="text"
+                  danger
+                  size="small"
+                  icon={<DeleteOutlined />}
+                  onClick={() => removeBuild(buildIndex)}
+                >
+                  删除
+                </Button>
+              </div>
+
+              {/* 装备列表 */}
+              <div className="equipment-cards-container">
+                {(build.equipments || []).map((equip, equipIndex) => {
+                  const equipment = equipments.find(e => e.id === equip.equipmentId)
+                  if (!equipment) return null
+
+                  return (
+                    <div
+                      key={equip.id || `${buildIndex}-${equipIndex}`}
+                      className={`equipment-card ${draggingBuildEquipIndex === equipIndex && activeBuildIndex === buildIndex ? 'dragging' : ''}`}
+                      draggable
+                      onDragStart={() => handleEquipmentDragStart(buildIndex, equipIndex)}
+                      onDragOver={(e) => handleEquipmentDragOver(e, buildIndex, equipIndex)}
+                      onDragEnd={handleEquipmentDragEnd}
+                    >
+                      <HolderOutlined style={{ color: '#ccc', fontSize: 14 }} />
+                      <img
+                        src={equipment.icon}
+                        alt={equipment.name}
+                        className="equipment-card-icon"
+                      />
+                      <div className="equipment-card-info">
+                        <span className="equipment-card-name">{equipment.name}</span>
+                        <span className="equipment-card-price">{equipment.price}金币</span>
+                      </div>
+                      <span className="equipment-card-priority">{equip.priority}</span>
                       <Button
                         type="text"
                         danger
-                        icon={<MinusCircleOutlined />}
-                        onClick={() => {
-                          remove(name)
-                          removeBuild(index)
-                        }}
-                      >
-                        删除此套
-                      </Button>
-                    }
-                  >
-                    <Row gutter={16}>
-                      <Col span={10}>
-                        <Form.Item
-                          {...restField}
-                          name={[name, 'name']}
-                          label="出装思路名称"
-                          rules={[{ required: true, message: '请输入名称' }]}
-                        >
-                          <Input placeholder="如：标准输出装、半肉出装" />
-                        </Form.Item>
-                      </Col>
-                      <Col span={14}>
-                        <Form.Item {...restField} name={[name, 'description']} label="描述">
-                          <Input placeholder="出装思路说明" />
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                    <Form.List name={[name, 'equipments']}>
-                      {(equipFields, { add: addEquip, remove: removeEquip }) => (
-                        <>
-                          {equipFields.map(({ key: equipKey, name: equipName, ...restEquipField }, equipIndex) => (
-                            <Card
-                              key={equipKey}
-                              size="small"
-                              style={{ marginBottom: 8, backgroundColor: '#fafafa' }}
-                              extra={
-                                <Button
-                                  type="text"
-                                  danger
-                                  size="small"
-                                  icon={<MinusCircleOutlined />}
-                                  onClick={() => removeEquip(equipName)}
-                                >
-                                  移除
-                                </Button>
-                              }
-                            >
-                              <Row gutter={16}>
-                                <Col span={10}>
-                                  <Form.Item
-                                    {...restEquipField}
-                                    name={[equipName, 'equipmentId']}
-                                    label={`装备 ${equipIndex + 1}`}
-                                    rules={[{ required: true, message: '请选择装备' }]}
-                                  >
-                                    <Select
-                                      placeholder="请选择装备"
-                                      options={equipments.map((e) => ({
-                                        label: `${e.name} (${e.price}金币)`,
-                                        value: e.id,
-                                      }))}
-                                      showSearch
-                                      filterOption={(input, option) =>
-                                        (option?.label as string)?.toLowerCase().includes(input.toLowerCase())
-                                      }
-                                    />
-                                  </Form.Item>
-                                </Col>
-                                <Col span={6}>
-                                  <Form.Item
-                                    {...restEquipField}
-                                    name={[equipName, 'priority']}
-                                    label="顺序"
-                                    initialValue={equipIndex + 1}
-                                  >
-                                    <InputNumber min={1} max={99} style={{ width: '100%' }} />
-                                  </Form.Item>
-                                </Col>
-                                <Col span={8}>
-                                  <Form.Item {...restEquipField} name={[equipName, 'description']} label="说明">
-                                    <Input placeholder="推荐理由" />
-                                  </Form.Item>
-                                </Col>
-                              </Row>
-                            </Card>
-                          ))}
-                          <Button
-                            type="dashed"
-                            onClick={() => addEquip({ equipmentId: null, priority: equipFields.length + 1, description: '' })}
-                            block
-                            icon={<PlusOutlined />}
-                          >
-                            添加装备
-                          </Button>
-                        </>
-                      )}
-                    </Form.List>
-                  </Card>
-                ))}
-                <Button
-                  type="dashed"
-                  onClick={() => {
-                    add({
-                      name: `出装思路 ${fields.length + 1}`,
-                      description: '',
-                      priority: fields.length,
-                      equipments: [],
-                    })
-                    addNewBuild()
+                        size="small"
+                        icon={<DeleteOutlined />}
+                        className="equipment-card-remove"
+                        onClick={() => removeEquipment(buildIndex, equipIndex)}
+                      />
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* 添加装备区域 */}
+              <div className="add-equipment-section">
+                <Select
+                  className="equipment-quick-select"
+                  placeholder="搜索并添加装备..."
+                  showSearch
+                  optionFilterProp="label"
+                  onChange={(value) => {
+                    addEquipment(buildIndex, value)
                   }}
-                  block
-                  icon={<PlusOutlined />}
-                >
-                  添加出装思路
-                </Button>
-              </>
-            )}
-          </Form.List>
-        </Form>
+                  options={equipments
+                    .filter(e => !(build.equipments || []).some(be => be.equipmentId === e.id))
+                    .map(e => ({
+                      label: e.name,
+                      value: e.id,
+                      icon: e.icon,
+                      price: e.price,
+                    }))}
+                  dropdownRender={(menu) => (
+                    <div className="equipment-select-dropdown">
+                      {menu}
+                    </div>
+                  )}
+                  optionRender={(option) => (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <img
+                        src={option.data.icon}
+                        alt=""
+                        style={{ width: 24, height: 24, borderRadius: 4, objectFit: 'contain' }}
+                      />
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ fontSize: 13, fontWeight: 500 }}>{option.data.label}</span>
+                        <span style={{ fontSize: 11, color: '#999' }}>{option.data.price}金币</span>
+                      </div>
+                    </div>
+                  )}
+                  notFoundContent={<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无可用装备" />}
+                />
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        <Button
+          type="dashed"
+          onClick={addNewBuild}
+          block
+          icon={<PlusOutlined />}
+          style={{ marginTop: 16 }}
+        >
+          添加出装思路
+        </Button>
       </Modal>
 
       {/* 推荐海克斯弹窗 */}

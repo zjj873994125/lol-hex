@@ -96,7 +96,6 @@ const MobileHeroDetail = () => {
 
   const handleHexTouchStart = (hexId: number) => {
     longPressTimer.current = setTimeout(() => {
-      console.log('handleHexTouchStart', hexId)
       setActiveHexTooltip(hexId)
     }, LONG_PRESS_DURATION)
   }
@@ -108,6 +107,15 @@ const MobileHeroDetail = () => {
     }
     setActiveHexTooltip(null)
   }
+
+  // 组件卸载时清理 timer
+  useEffect(() => {
+    return () => {
+      if (longPressTimer.current) {
+        clearTimeout(longPressTimer.current)
+      }
+    }
+  }, [])
 
   if (loading) {
     return (

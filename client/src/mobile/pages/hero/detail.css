@@ -251,9 +251,6 @@
   border-radius: 1.5rem;
   padding: 1rem 1.2rem;
   backdrop-filter: blur(10px);
-}
-
-.hex-tier-item {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
@@ -294,10 +291,6 @@
   user-select: none;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-}
-
-.hex-icon-wrap * {
-  pointer-events: none;
 }
 
 .hex-icon-bg {
